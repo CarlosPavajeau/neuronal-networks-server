@@ -83,10 +83,16 @@ void Session::DoReadBody()
                             });
 }
 
+void Session::HandleServerSide(Message& message)
+{
+    std::cout << "[server]: Received server-side opcode "
+              << GetOpcodeNameForLogging(static_cast<OpcodeClient>(message.Opcode()));
+}
+
 void Session::HandleInitNeuron(Message& message)
 {
     Message responseMessage;
-    responseMessage.Opcode(MSGS_INIT_NEURON);
+    responseMessage.Opcode(SMSG_INIT_NEURON);
 
     const char* r_message = "Init neuron";
 

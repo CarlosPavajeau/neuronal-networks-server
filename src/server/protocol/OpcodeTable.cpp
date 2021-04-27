@@ -49,7 +49,7 @@ OpcodeTable::OpcodeTable()
     memset(_internalTableClient, 0, sizeof(_internalTableClient));
 }
 
-OpcodeTable::~OpcodeTable() noexcept
+OpcodeTable::~OpcodeTable()
 {
     for (uint16 i = 0; i < NUM_OPCODE_HANDLERS; ++i)
     {
@@ -62,7 +62,7 @@ void OpcodeTable::ValidateAndSetClientOpcode(OpcodeClient opcode, const char* na
 {
     if (uint32(opcode) == NULL_OPCODE)
     {
-        return;;
+        return;
     }
 
     if (uint32(opcode) >= NUM_OPCODE_HANDLERS)
@@ -78,14 +78,39 @@ void OpcodeTable::ValidateAndSetClientOpcode(OpcodeClient opcode, const char* na
     _internalTableClient[opcode] = new PacketHandler<typename get_message_class<Handler>::type, HandlerFunction>(name);
 }
 
+void OpcodeTable::ValidateAndSetServerOpcode(OpcodeServer opcode, const char* name)
+{
+    if (uint32(opcode) == NULL_OPCODE)
+    {
+        return;
+    }
+
+    if (uint32(opcode) >= NUM_OPCODE_HANDLERS)
+    {
+        return;
+    }
+
+    if (_internalTableClient[opcode] != nullptr)
+    {
+        return;
+    }
+
+    _internalTableClient[opcode] = new PacketHandler<Message, &Session::HandleServerSide>(name);
+}
+
 void OpcodeTable::Initialize()
 {
 #define DEFINE_HANDLER(opcode, handler) \
     ValidateAndSetClientOpcode<decltype(handler), handler>(opcode, #opcode)
 
-    DEFINE_HANDLER(MSGC_INIT_NEURON, &Session::HandleInitNeuron);
+#define DEFINE_SERVER_OP_CODE_HANDLER(opcode) \
+    ValidateAndSetServerOpcode(opcode, #opcode)
+
+    DEFINE_HANDLER(CMSG_INIT_NEURON, &Session::HandleInitNeuron);
+    DEFINE_SERVER_OP_CODE_HANDLER(SMSG_INIT_NEURON);
 
 #undef DEFINE_HANDLER
+#undef DEFINE_SERVER_OP_CODE_HANDLER
 }
 
 std::string GetOpcodeNameForLogging(Opcodes id)

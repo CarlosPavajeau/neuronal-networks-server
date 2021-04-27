@@ -25,14 +25,11 @@ public:
         return _internalTableClient[index];
     }
 
-    ClientOpcodeHandler const* GetClientOpcodeHandler(Opcodes index) const
-    {
-        return _internalTableClient[index];
-    }
-
 private:
     template<typename Handler, Handler HandlerFunction>
     void ValidateAndSetClientOpcode(OpcodeClient opcode, char const* name);
+
+    void ValidateAndSetServerOpcode(OpcodeServer opcode, char const* name);
 
     ClientOpcodeHandler* _internalTableClient[NUM_OPCODE_HANDLERS];
 };

@@ -15,11 +15,13 @@
 
 enum Opcodes : uint16
 {
-    MSGC_INIT_NEURON = 0x001,
-    MSGS_INIT_NEURON = 0x002,
-    MSGC_TRAIN_NEURON = 0x003,
-    MSGS_TRAIN_NEURON = 0x004,
-    NUM_MSG_TYPES = 0x005
+    CMSG_INIT_NEURON = 0x001,
+    SMSG_INIT_NEURON = 0x002,
+    CMSG_TRAIN_NEURON = 0x003,
+    SMSG_TRAIN_NEURON = 0x004,
+    CMSG_SIMULATE_DATA = 0x005,
+    SMSG_SIMULATE_DATA = 0x006,
+    NUM_MSG_TYPES = 0x007
 };
 
 enum OpcodeMisc : uint16
@@ -29,6 +31,7 @@ enum OpcodeMisc : uint16
 };
 
 typedef Opcodes OpcodeClient;
+typedef Opcodes OpcodeServer;
 
 class Session;
 

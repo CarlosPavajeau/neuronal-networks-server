@@ -6,7 +6,6 @@
 #define NEURONAL_NETWORKS_SERVER_SESSION_HPP
 
 #include "Message.hpp"
-#include "Opcodes.hpp"
 
 #include <memory>
 #include <iostream>
@@ -24,6 +23,8 @@ public:
     void Write(const Message& msg);
 
     Message ReadMessage() const;
+
+    void HandleServerSide(Message& message);
 
     void HandleInitNeuron(Message& message);
 
