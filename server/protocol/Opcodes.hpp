@@ -5,7 +5,7 @@
 #ifndef NEURONAL_NETWORKS_SERVER_OPCODES_HPP
 #define NEURONAL_NETWORKS_SERVER_OPCODES_HPP
 
-#include "Define.hpp"
+#include "common/Define.hpp"
 
 #include <iomanip>
 #include <vector>
