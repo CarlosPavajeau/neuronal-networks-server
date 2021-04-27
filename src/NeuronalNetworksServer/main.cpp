@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "Server.hpp"
+#include "OpcodeTable.h"
 
 int main(int argc, char* argv[])
 {
@@ -15,6 +16,8 @@ int main(int argc, char* argv[])
 
         boost::asio::io_context io_context;
         tcp::endpoint endpoint(tcp::v4(), std::atoi(argv[1]));
+
+        opcodeTable.Initialize();
 
         Server server(io_context, endpoint);
 
