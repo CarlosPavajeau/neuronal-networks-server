@@ -16,4 +16,6 @@ include(cmake/options.cmake)
 include(GroupSources)
 include(AutoCollect)
 
+add_subdirectory(dep)
+
 add_subdirectory(src)
