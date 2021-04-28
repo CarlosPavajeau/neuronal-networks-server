@@ -5,6 +5,6 @@
 #ifndef NEURONAL_NETWORKS_SERVER_ALLMODELS_H
 #define NEURONAL_NETWORKS_SERVER_ALLMODELS_H
 
-#include "Madeline.h"
+#include "MadelineModels.h"
 
 #endif //NEURONAL_NETWORKS_SERVER_ALLMODELS_H
