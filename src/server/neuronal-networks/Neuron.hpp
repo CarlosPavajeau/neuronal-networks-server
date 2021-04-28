@@ -2,8 +2,8 @@
 // Created by cantte on 28/04/21.
 //
 
-#ifndef NEURONAL_NETWORKS_SERVER_NEURON_H
-#define NEURONAL_NETWORKS_SERVER_NEURON_H
+#ifndef NEURONAL_NETWORKS_SERVER_NEURON_HPP
+#define NEURONAL_NETWORKS_SERVER_NEURON_HPP
 
 #include <vector>
 #include <random>
@@ -69,4 +69,4 @@ private:
 };
 
 
-#endif //NEURONAL_NETWORKS_SERVER_NEURON_H
+#endif //NEURONAL_NETWORKS_SERVER_NEURON_HPP

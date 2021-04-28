@@ -2,8 +2,8 @@
 // Created by cantte on 28/04/21.
 //
 
-#include "Neuron.h"
-#include "TriggerFunction.h"
+#include "Neuron.hpp"
+#include "TriggerFunction.hpp"
 #include "Random.h"
 
 Neuron::Neuron(const NeuronInitInfo& neuronInitInfo) : _sill(0), _previousSill(0), _isLock(false), _isVisited(false),
