@@ -45,6 +45,14 @@ public:
 
     void UnVisited() { _isVisited = false; }
 
+    double GetError() const { return _error; }
+
+    void SetError(double new_error) { _error = new_error; }
+
+    double GetNewError() const { return _newError; }
+
+    void SetNewError(double new_error) { _newError = new_error; }
+
 private:
     void Init();
 
