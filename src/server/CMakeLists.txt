@@ -5,8 +5,7 @@ CollectSourceFiles(
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(server
-        ${PRIVATE_SOURCES}
-        models/Madeline.h models/AllModels.h)
+        ${PRIVATE_SOURCES})
 
 target_link_libraries(server ${CMAKE_THREAD_LIBS_INIT})
 
