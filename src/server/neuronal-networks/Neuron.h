@@ -29,13 +29,29 @@ public:
 
     void ResetWeightsAndSill();
 
+    std::vector<double> GetWeights() const { return _weights; }
+
+    double GetSill() const { return _sill; }
+
+    bool IsLock() const { return _isLock; }
+
+    void Lock() { _isLock = true; }
+
+    void UnLock() { _isLock = false; }
+
+    bool IsVisited() const { return _isVisited; }
+
+    void Visited() { _isVisited = true; }
+
+    void UnVisited() { _isVisited = false; }
+
 private:
     void Init();
 
     double GetNextInput(std::vector<double> inputs);
 
-    double _sill, _previusSill;
-    std::vector<double> _weights, _previusWeights;
+    double _sill, _previousSill;
+    std::vector<double> _weights, _previousWeights;
     TriggerFunction* _triggerFunction;
     double _trainingRate;
 

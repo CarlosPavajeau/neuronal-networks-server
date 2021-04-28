@@ -6,7 +6,7 @@
 #include "TriggerFunction.h"
 #include "Random.h"
 
-Neuron::Neuron(const NeuronInitInfo& neuronInitInfo) : _sill(0), _previusSill(0), _isLock(false), _isVisited(false),
+Neuron::Neuron(const NeuronInitInfo& neuronInitInfo) : _sill(0), _previousSill(0), _isLock(false), _isVisited(false),
                                                        _error(0), _newError(0)
 {
     _weights = std::vector<double>(neuronInitInfo.InputNumber);
@@ -33,8 +33,8 @@ void Neuron::Learn(std::vector<double> inputs, double error)
         return;
     }
 
-    _previusSill = _sill;
-    _previusWeights = _weights;
+    _previousSill = _sill;
+    _previousWeights = _weights;
 
     for (int i = 0; i < _weights.size(); ++i)
     {
@@ -67,6 +67,6 @@ double Neuron::GetNextInput(std::vector<double> inputs)
 
 void Neuron::ResetWeightsAndSill()
 {
-    _weights = _previusWeights;
-    _sill = _previusSill;
+    _weights = _previousWeights;
+    _sill = _previousSill;
 }
