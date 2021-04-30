@@ -124,3 +124,20 @@ void Session::HandleInitMadeline(Message& message)
 
     Write(responseMessage);
 }
+
+void Session::HandleStartTrainingMadeline(Message& message)
+{
+    json::parser parser;
+    parser.write(message.Body(), message.BodyLength());
+    json::value value = parser.release();
+
+    const MadelineTrainingInfo madelineTrainingInfo = json::value_to<MadelineTrainingInfo>(value);
+
+    if (_madeline)
+    {
+        if (_madeline->Train(madelineTrainingInfo))
+        {
+            std::cout << "[server]: Training success!";
+        }
+    }
+}

@@ -30,6 +30,8 @@ public:
 
     void HandleInitMadeline(Message& message);
 
+    void HandleStartTrainingMadeline(Message& message);
+
 private:
     void DoReadHeader();
 

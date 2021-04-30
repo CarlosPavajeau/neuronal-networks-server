@@ -107,6 +107,8 @@ void OpcodeTable::Initialize()
     ValidateAndSetServerOpcode(opcode, #opcode)
 
     DEFINE_HANDLER(CMSG_INIT_MADELINE, &Session::HandleInitMadeline);
+    DEFINE_HANDLER(CMSG_TRAIN_MADELINE, &Session::HandleStartTrainingMadeline);
+
     DEFINE_SERVER_OP_CODE_HANDLER(SMSG_INIT_MADELINE);
 
 #undef DEFINE_HANDLER
@@ -115,7 +117,7 @@ void OpcodeTable::Initialize()
 
 std::string GetOpcodeNameForLogging(Opcodes id)
 {
-    uint16 opcode = uint16(id);
+    auto opcode = uint16(id);
     std::ostringstream ss;
     ss << '[';
 
