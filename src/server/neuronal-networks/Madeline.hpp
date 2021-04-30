@@ -6,7 +6,7 @@
 #define NEURONAL_NETWORKS_SERVER_MADELINE_H
 
 #include "Layer.hpp"
-#include "AllModels.h"
+#include "MadelineModels.h"
 
 #include <vector>
 
@@ -23,10 +23,11 @@ public:
 
     bool Train(const MadelineTrainingInfo& madelineTrainingInfo);
 
+    std::vector<Layer> GetLayers() const { return _layers; }
+
 private:
     std::vector<Layer> _layers;
     Session* _session;
 };
-
 
 #endif //NEURONAL_NETWORKS_SERVER_MADELINEMODELS_H
