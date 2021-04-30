@@ -13,10 +13,12 @@
 
 using boost::asio::ip::tcp;
 
+class Madeline;
+
 class Session : public std::enable_shared_from_this<Session>
 {
 public:
-    explicit Session(tcp::socket socket) : _socket(std::move(socket)) {}
+    explicit Session(tcp::socket socket);
 
     void Start();
 
@@ -35,6 +37,7 @@ private:
 
     tcp::socket _socket;
     Message _read_msg, _write_msg;
+    Madeline* _madeline;
 };
 
 #endif //NEURONAL_NETWORKS_SERVER_SESSION_HPP

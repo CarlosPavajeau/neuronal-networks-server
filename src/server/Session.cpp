@@ -4,8 +4,19 @@
 
 #include "Session.hpp"
 #include "Message.hpp"
+#include "Madeline.hpp"
 #include "Opcodes.hpp"
 #include "OpcodeTable.h"
+#include "MadelineParsers.h"
+
+#include <boost/json/src.hpp>
+
+namespace json = boost::json;
+
+Session::Session(tcp::socket socket) : _socket(std::move(socket)), _madeline(nullptr)
+{
+
+}
 
 void Session::Start()
 {
@@ -91,10 +102,20 @@ void Session::HandleServerSide(Message& message)
 
 void Session::HandleInitNeuron(Message& message)
 {
+    json::parser parser;
+    parser.write(message.Body(), message.BodyLength());
+    json::value value = parser.release();
+
+    const MadelineCreateInfo madelineCreateInfo = json::value_to<MadelineCreateInfo>(value);
+
+    _madeline = new Madeline(madelineCreateInfo, this);
+
     Message responseMessage;
     responseMessage.Opcode(SMSG_INIT_NEURON);
 
-    const char* r_message = "Init neuron";
+    json::value responseValue = json::value_from(*_madeline);
+    std::string responseStr = json::serialize(responseValue);
+    const char* r_message = responseStr.c_str();
 
     responseMessage.BodyLength(std::strlen(r_message));
     std::memcpy(responseMessage.Body(), r_message, responseMessage.BodyLength());
@@ -103,4 +124,3 @@ void Session::HandleInitNeuron(Message& message)
 
     Write(responseMessage);
 }
-
