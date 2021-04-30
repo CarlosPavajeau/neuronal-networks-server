@@ -24,6 +24,12 @@ public:
 struct MadelineTrainingInfo
 {
 public:
+    MadelineTrainingInfo(std::vector<std::vector<double>> inputs, std::vector<std::vector<double>> outputs,
+                         double errorTolerance, int maxSteps) : Inputs(std::move(inputs)),
+                                                                Outputs(std::move(outputs)),
+                                                                ErrorTolerance(errorTolerance),
+                                                                MaxSteps(maxSteps) {}
+
     std::vector<std::vector<double>> Inputs;
     std::vector<std::vector<double>> Outputs;
     double ErrorTolerance;

@@ -29,6 +29,17 @@ MadelineCreateInfo tag_invoke(const json::value_to_tag<MadelineCreateInfo>&, con
     return MadelineCreateInfo(inputsNumber, neuronsPerLayer, triggerFunctions, trainingRate);
 }
 
+MadelineTrainingInfo tag_invoke(const boost::json::value_to_tag<MadelineTrainingInfo>&, const boost::json::value& value)
+{
+    double errorTolerance = value.at("ErrorTolerance").as_double();
+    int maxSteps = value.at("MaxSteps").as_int64();
+
+    auto inputs = json::value_to<std::vector<std::vector<double>>>(value.at("Inputs"));
+    auto outputs = json::value_to<std::vector<std::vector<double>>>(value.at("Outputs"));
+
+    return MadelineTrainingInfo(inputs, outputs, errorTolerance, maxSteps);
+}
+
 void tag_invoke(const json::value_from_tag&, json::value& jv, Madeline const& m)
 {
     jv = {
