@@ -30,10 +30,15 @@ public:
 
     std::vector<double> GetOutputs() const { return _outputs; }
 
-    std::list<Neuron> GetNeurons() const { return _neurons; }
+    std::vector<Neuron> GetNeurons() const { return _neurons; }
+
+    Neuron& operator[](int index)
+    {
+        return _neurons[index];
+    }
 
 private:
-    std::list<Neuron> _neurons;
+    std::vector<Neuron> _neurons;
     std::vector<double> _outputs;
 };
 
