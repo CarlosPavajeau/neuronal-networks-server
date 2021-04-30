@@ -100,7 +100,7 @@ void Session::HandleServerSide(Message& message)
               << GetOpcodeNameForLogging(static_cast<OpcodeClient>(message.Opcode()));
 }
 
-void Session::HandleInitNeuron(Message& message)
+void Session::HandleInitMadeline(Message& message)
 {
     json::parser parser;
     parser.write(message.Body(), message.BodyLength());
@@ -111,7 +111,7 @@ void Session::HandleInitNeuron(Message& message)
     _madeline = new Madeline(madelineCreateInfo, this);
 
     Message responseMessage;
-    responseMessage.Opcode(SMSG_INIT_NEURON);
+    responseMessage.Opcode(SMSG_INIT_MADELINE);
 
     json::value responseValue = json::value_from(*_madeline);
     std::string responseStr = json::serialize(responseValue);

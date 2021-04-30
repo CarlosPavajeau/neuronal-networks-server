@@ -106,8 +106,8 @@ void OpcodeTable::Initialize()
 #define DEFINE_SERVER_OP_CODE_HANDLER(opcode) \
     ValidateAndSetServerOpcode(opcode, #opcode)
 
-    DEFINE_HANDLER(CMSG_INIT_NEURON, &Session::HandleInitNeuron);
-    DEFINE_SERVER_OP_CODE_HANDLER(SMSG_INIT_NEURON);
+    DEFINE_HANDLER(CMSG_INIT_MADELINE, &Session::HandleInitMadeline);
+    DEFINE_SERVER_OP_CODE_HANDLER(SMSG_INIT_MADELINE);
 
 #undef DEFINE_HANDLER
 #undef DEFINE_SERVER_OP_CODE_HANDLER

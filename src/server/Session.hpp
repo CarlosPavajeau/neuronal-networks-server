@@ -28,7 +28,7 @@ public:
 
     void HandleServerSide(Message& message);
 
-    void HandleInitNeuron(Message& message);
+    void HandleInitMadeline(Message& message);
 
 private:
     void DoReadHeader();
