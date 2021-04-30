@@ -30,6 +30,8 @@ public:
 
     std::vector<double> GetOutputs() const { return _outputs; }
 
+    std::list<Neuron> GetNeurons() const { return _neurons; }
+
 private:
     std::list<Neuron> _neurons;
     std::vector<double> _outputs;
