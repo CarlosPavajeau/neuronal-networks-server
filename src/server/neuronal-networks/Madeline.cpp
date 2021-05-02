@@ -92,7 +92,88 @@ bool Madeline::Train(const MadelineTrainingInfo& madelineTrainingInfo)
                 }
             }
 
-            // TODO: Temporary/permanent modification of weights
+            // Temporary/permanent modification of weights
+            for (int j = _layers.size(); j >= 0; --j)
+            {
+                int neurons_to_take = 1;
+                auto not_visited = [](const Neuron& neuron) { return neuron.IsVisited(); };
+                bool all_neurons_visited = std::any_of(_layers[j].GetNeurons().begin(), _layers[j].GetNeurons().end(),
+                                                       not_visited);
+                while (!all_neurons_visited)
+                {
+                    auto available_neurons = std::vector<Neuron>();
+                    std::copy_if(_layers[j].GetNeurons().begin(),
+                                 _layers[j].GetNeurons().end(),
+                                 available_neurons.begin(),
+                                 [](const Neuron& neuron) { return !neuron.IsLock(); });
+
+                    auto take_neurons = std::vector<Neuron>(
+                            neurons_to_take <= available_neurons.size() ? neurons_to_take : available_neurons.size());
+                    std::partial_sort_copy(available_neurons.begin(), available_neurons.end(), take_neurons.begin(),
+                                           take_neurons.end(), [](const Neuron& a, const Neuron& b)
+                                           {
+                                               return a.GetError() < b.GetError();
+                                           });
+
+                    for (auto& neuron : take_neurons)
+                    {
+                        neuron.Visited();
+                        neuron.Learn(j == 0 ? input : _layers[j - 1].GetOutputs(), neuron.GetError());
+                    }
+
+                    auto new_output = Output(input);
+                    std::vector<double> new_output_errors;
+                    for (int k = 0; k < expectedOutput.size(); ++k)
+                    {
+                        double error = new_output[k] - expectedOutput[k];
+                        new_output_errors.push_back(error);
+                    }
+
+                    for (int k = 0; k < new_output_errors.size(); ++k)
+                    {
+                        output_layer[k].SetNewError(new_output_errors[k]);
+                    }
+
+                    for (int k = _layers.size() - 2; k >= 0; --k)
+                    {
+                        for (int l = 0; l < _layers[k].GetNeurons().size(); ++l)
+                        {
+                            double error = 0.0;
+                            for (int m = 0; m < _layers[k + 1].GetNeurons().size(); ++m)
+                            {
+                                const auto& neuron = _layers[k + 1][m];
+                                error += neuron.GetNewError() * neuron.GetWeights()[l];
+                            }
+
+                            _layers[k][l].SetNewError(error);
+                        }
+                    }
+
+                    for (auto& neuron : take_neurons)
+                    {
+                        if (neuron.GetNewError() > neuron.GetError())
+                        {
+                            neuron.ResetWeightsAndSill();
+                        } else
+                        {
+                            neuron.Lock();
+                        }
+                    }
+
+                    ++neurons_to_take;
+                    all_neurons_visited = std::any_of(_layers[j].GetNeurons().begin(), _layers[j].GetNeurons().end(),
+                                                      not_visited);
+                }
+            }
+
+            for (auto& layer : _layers)
+            {
+                for (auto& neuron : layer.GetNeurons())
+                {
+                    neuron.UnLock();
+                    neuron.UnVisited();
+                }
+            }
         }
 
         double iterationError = 0.0;

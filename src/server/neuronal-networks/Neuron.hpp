@@ -23,6 +23,8 @@ class Neuron
 public:
     explicit Neuron(const NeuronInitInfo& neuronInitInfo);
 
+    Neuron() {}
+
     void Learn(std::vector<double> inputs, double error);
 
     double Output(std::vector<double> inputs);
