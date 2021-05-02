@@ -96,7 +96,7 @@ bool Madeline::Train(const MadelineTrainingInfo& madelineTrainingInfo)
             for (int j = _layers.size(); j >= 0; --j)
             {
                 int neurons_to_take = 1;
-                auto not_visited = [](const Neuron& neuron) { return neuron.IsVisited(); };
+                auto not_visited = [](const Neuron& neuron) { return !neuron.IsVisited(); };
                 bool all_neurons_visited = std::any_of(_layers[j].GetNeurons().begin(), _layers[j].GetNeurons().end(),
                                                        not_visited);
                 while (!all_neurons_visited)
