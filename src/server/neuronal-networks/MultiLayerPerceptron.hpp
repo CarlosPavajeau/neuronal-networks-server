@@ -2,8 +2,8 @@
 // Created by cantte on 28/04/21.
 //
 
-#ifndef NEURONAL_NETWORKS_SERVER_MADELINEMODELS_H
-#define NEURONAL_NETWORKS_SERVER_MADELINE_H
+#ifndef NEURONAL_NETWORKS_SERVER_MULTILAYER_PERCEPTRON_H
+#define NEURONAL_NETWORKS_SERVER_MULTILAYER_PERCEPTRON_H
 
 #include "Layer.hpp"
 #include "MadelineModels.h"
@@ -12,14 +12,15 @@
 
 class Session;
 
-class Madeline
+class MultiLayerPerceptron
 {
     friend class Session;
 
 public:
-    explicit Madeline(const std::vector<uint64_t>& layers_nodes, const std::vector<std::string>& layers_act_funcs, Session* session);
+    explicit MultiLayerPerceptron(const std::vector<uint64_t>& layers_nodes,
+                                  const std::vector<std::string>& layers_act_funcs, Session* session);
 
-    ~Madeline();
+    ~MultiLayerPerceptron();
 
     void GetOutput(const std::vector<double>& input, std::vector<double>* output,
                    std::vector<std::vector<double>>* all_layers_activations = nullptr) const;
@@ -51,4 +52,4 @@ private:
     Session* _session;
 };
 
-#endif //NEURONAL_NETWORKS_SERVER_MADELINEMODELS_H
+#endif //NEURONAL_NETWORKS_SERVER_MULTILAYER_PERCEPTRON_Hs

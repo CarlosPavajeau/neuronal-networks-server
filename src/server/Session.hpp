@@ -13,7 +13,7 @@
 
 using boost::asio::ip::tcp;
 
-class Madeline;
+class MultiLayerPerceptron;
 
 class Session : public std::enable_shared_from_this<Session>
 {
@@ -43,7 +43,7 @@ private:
 
     tcp::socket _socket;
     Message _read_msg, _write_msg;
-    Madeline* _madeline;
+    MultiLayerPerceptron* _madeline;
 };
 
 #endif //NEURONAL_NETWORKS_SERVER_SESSION_HPP

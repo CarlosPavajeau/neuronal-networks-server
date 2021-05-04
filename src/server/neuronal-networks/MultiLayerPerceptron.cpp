@@ -2,13 +2,13 @@
 // Created by cantte on 28/04/21.
 //
 
-#include "Madeline.hpp"
+#include "MultiLayerPerceptron.hpp"
 #include "Session.hpp"
 #include "Utils.h"
 
 #include <algorithm>
 
-Madeline::Madeline(const std::vector<uint64_t>& layers_nodes, const std::vector<std::string>& layers_act_funcs,
+MultiLayerPerceptron::MultiLayerPerceptron(const std::vector<uint64_t>& layers_nodes, const std::vector<std::string>& layers_act_funcs,
                    Session* session) : _session(session)
 {
     assert(layers_nodes.size() >= 2);
@@ -17,7 +17,7 @@ Madeline::Madeline(const std::vector<uint64_t>& layers_nodes, const std::vector<
     Init(layers_nodes, layers_act_funcs);
 }
 
-Madeline::~Madeline()
+MultiLayerPerceptron::~MultiLayerPerceptron()
 {
     _num_inputs = 0;
     _num_outputs = 0;
@@ -26,7 +26,7 @@ Madeline::~Madeline()
     _layers.clear();
 }
 
-void Madeline::Init(const std::vector<uint64_t>& layers_nodes, const std::vector<std::string>& layers_act_funcs)
+void MultiLayerPerceptron::Init(const std::vector<uint64_t>& layers_nodes, const std::vector<std::string>& layers_act_funcs)
 {
     _layer_nodes = layers_nodes;
     _num_inputs = _layer_nodes[0];
@@ -39,7 +39,7 @@ void Madeline::Init(const std::vector<uint64_t>& layers_nodes, const std::vector
     }
 }
 
-void Madeline::GetOutput(const std::vector<double>& input, std::vector<double>* output,
+void MultiLayerPerceptron::GetOutput(const std::vector<double>& input, std::vector<double>* output,
                          std::vector<std::vector<double>>* all_layers_activations) const
 {
     assert(input.size() == _num_inputs);
@@ -89,12 +89,12 @@ void Madeline::GetOutput(const std::vector<double>& input, std::vector<double>* 
     }
 }
 
-void Madeline::GetOutputClass(const std::vector<double>& output, size_t* class_id) const
+void MultiLayerPerceptron::GetOutputClass(const std::vector<double>& output, size_t* class_id) const
 {
     GetIdMaxElement(output, class_id);
 }
 
-void Madeline::UpdateWeights(const std::vector<std::vector<double>>& all_layers_activations,
+void MultiLayerPerceptron::UpdateWeights(const std::vector<std::vector<double>>& all_layers_activations,
                              const std::vector<double>& error, double learning_rate)
 {
     std::vector<double> temp_dev_error = error;
@@ -112,7 +112,7 @@ void Madeline::UpdateWeights(const std::vector<std::vector<double>>& all_layers_
     }
 }
 
-bool Madeline::Train(const MadelineTrainingInfo& madelineTrainingInfo)
+bool MultiLayerPerceptron::Train(const MadelineTrainingInfo& madelineTrainingInfo)
 {
     int i = 0;
     double current_iteration_cost_function = 0.0;
@@ -151,7 +151,7 @@ bool Madeline::Train(const MadelineTrainingInfo& madelineTrainingInfo)
     return false;
 }
 
-std::vector<std::vector<double>> Madeline::GetLayerWeights(size_t layer_i)
+std::vector<std::vector<double>> MultiLayerPerceptron::GetLayerWeights(size_t layer_i)
 {
     std::vector<std::vector<double>> ret_val;
 
@@ -170,7 +170,7 @@ std::vector<std::vector<double>> Madeline::GetLayerWeights(size_t layer_i)
     }
 }
 
-void Madeline::SetLayerWeights(size_t layer_i, std::vector<std::vector<double>>& weights)
+void MultiLayerPerceptron::SetLayerWeights(size_t layer_i, std::vector<std::vector<double>>& weights)
 {
     if (0 <= layer_i && layer_i < _layers.size())
     {

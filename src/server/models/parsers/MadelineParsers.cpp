@@ -3,7 +3,7 @@
 //
 
 #include "MadelineParsers.h"
-#include "Madeline.hpp"
+#include "MultiLayerPerceptron.hpp"
 #include "MadelineModels.h"
 
 #include <boost/json.hpp>
@@ -32,7 +32,7 @@ MadelineTrainingInfo tag_invoke(const boost::json::value_to_tag<MadelineTraining
     return MadelineTrainingInfo(inputs, outputs, errorTolerance, learning_rate, maxSteps);
 }
 
-void tag_invoke(const json::value_from_tag&, json::value& jv, Madeline const& m)
+void tag_invoke(const json::value_from_tag&, json::value& jv, MultiLayerPerceptron const& m)
 {
     jv = {
             {"Layers", json::value_from(m.GetLayers())}

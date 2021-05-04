@@ -4,7 +4,7 @@
 
 #include "Session.hpp"
 #include "Message.hpp"
-#include "Madeline.hpp"
+#include "MultiLayerPerceptron.hpp"
 #include "Opcodes.hpp"
 #include "OpcodeTable.h"
 #include "MadelineParsers.h"
@@ -122,7 +122,7 @@ void Session::HandleInitMadeline(Message& message)
 
     const MadelineCreateInfo madelineCreateInfo = json::value_to<MadelineCreateInfo>(value);
 
-    _madeline = new Madeline(madelineCreateInfo.NeuronsPerLayer, madelineCreateInfo.ActivationFunctions, this);
+    _madeline = new MultiLayerPerceptron(madelineCreateInfo.NeuronsPerLayer, madelineCreateInfo.ActivationFunctions, this);
 
     Message responseMessage;
     responseMessage.Opcode(SMSG_INIT_MADELINE);
@@ -153,7 +153,7 @@ void Session::HandleStartTrainingMadeline(Message& message)
         }
     } else
     {
-        std::cout << "[server]: Madeline not init" << std::endl;
+        std::cout << "[server]: MultiLayerPerceptron not init" << std::endl;
     }
 }
 
@@ -186,6 +186,6 @@ void Session::HandleSimulateData(Message& message)
         Write(responseMessage);
     } else
     {
-        std::cout << "[server]: Madeline not init!";
+        std::cout << "[server]: MultiLayerPerceptron not init!";
     }
 }

@@ -8,7 +8,7 @@
 struct MadelineCreateInfo;
 struct MadelineTrainingInfo;
 
-class Madeline;
+class MultiLayerPerceptron;
 
 class Layer;
 
@@ -34,7 +34,7 @@ MadelineCreateInfo tag_invoke(const boost::json::value_to_tag<MadelineCreateInfo
 MadelineTrainingInfo
 tag_invoke(const boost::json::value_to_tag<MadelineTrainingInfo>&, const boost::json::value& value);
 
-void tag_invoke(const boost::json::value_from_tag&, boost::json::value& jv, Madeline const& madeline);
+void tag_invoke(const boost::json::value_from_tag&, boost::json::value& jv, MultiLayerPerceptron const& madeline);
 
 void tag_invoke(const boost::json::value_from_tag&, boost::json::value& jv, Layer const& layer);
 
