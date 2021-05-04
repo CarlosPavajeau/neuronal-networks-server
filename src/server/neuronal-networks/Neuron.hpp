@@ -14,7 +14,6 @@ struct NeuronInitInfo
 {
 public:
     int InputNumber;
-    double TrainingRate;
     TriggerFunction* Trigger;
 };
 
@@ -23,9 +22,9 @@ class Neuron
 public:
     explicit Neuron(const NeuronInitInfo& neuronInitInfo);
 
-    Neuron() {}
+    Neuron() = default;
 
-    void Learn(std::vector<double> inputs, double error);
+    void UpdateWeights(std::vector<double> inputs, double error, double learning_rate);
 
     double Output(std::vector<double> inputs);
 
@@ -33,7 +32,7 @@ public:
 
     std::vector<double> GetWeights() const { return _weights; }
 
-    double GetSill() const { return _sill; }
+    double GetBias() const { return _bias; }
 
     bool IsLock() const { return _isLock; }
 
@@ -60,14 +59,13 @@ private:
 
     double GetNextInput(std::vector<double> inputs);
 
-    double _sill, _previousSill;
+    double _bias{}, _previous_bias{};
     std::vector<double> _weights, _previousWeights;
-    TriggerFunction* _triggerFunction;
-    double _trainingRate;
+    TriggerFunction* _triggerFunction{};
 
-    bool _isLock, _isVisited;
+    bool _isLock{}, _isVisited{};
 
-    double _error, _newError;
+    double _error{}, _newError{};
 };
 
 

@@ -6,11 +6,10 @@
 #include "TriggerFunction.hpp"
 #include "Random.h"
 
-Neuron::Neuron(const NeuronInitInfo& neuronInitInfo) : _sill(0), _previousSill(0), _isLock(false), _isVisited(false),
+Neuron::Neuron(const NeuronInitInfo& neuronInitInfo) : _bias(0), _previous_bias(0), _isLock(false), _isVisited(false),
                                                        _error(0), _newError(0)
 {
     _weights = std::vector<double>(neuronInitInfo.InputNumber);
-    _trainingRate = neuronInitInfo.TrainingRate;
     _triggerFunction = neuronInitInfo.Trigger;
 
     Init();
@@ -23,25 +22,25 @@ void Neuron::Init()
         weight = drand(-1, 1);
     }
 
-    _sill = drand(-1, 1);
+    _bias = drand(-1, 1);
 }
 
-void Neuron::Learn(std::vector<double> inputs, double error)
+void Neuron::UpdateWeights(std::vector<double> inputs, double error, double learning_rate)
 {
     if (inputs.size() != _weights.size())
     {
         return;
     }
 
-    _previousSill = _sill;
+    _previous_bias = _bias;
     _previousWeights = _weights;
 
     for (int i = 0; i < _weights.size(); ++i)
     {
-        _weights[i] += _trainingRate * error * inputs[i];
+        _weights[i] += learning_rate * error * inputs[i];
     }
 
-    _sill = _trainingRate * error;
+    _bias = learning_rate * error;
 }
 
 double Neuron::Output(std::vector<double> inputs)
@@ -62,11 +61,11 @@ double Neuron::GetNextInput(std::vector<double> inputs)
         acc += _weights[i] * inputs[i];
     }
 
-    return acc + _sill;
+    return acc + _bias;
 }
 
 void Neuron::ResetWeightsAndSill()
 {
     _weights = _previousWeights;
-    _sill = _previousSill;
+    _bias = _previous_bias;
 }
