@@ -36,12 +36,10 @@ public:
     {
         return _num_nodes;
     }
-    
-    std::vector<double> GetOutputs() const { return _outputs; }
 
     void GetOutputAfterActivationFunction(const std::vector<double>& input, std::vector<double>* output) const;
 
-    const std::vector<Node>& GetNeurons() const { return _nodes; }
+    const std::vector<Node>& GetNodes() const { return _nodes; }
 
     std::vector<Node>& GetNodesChangeable() { return _nodes; }
 
@@ -60,8 +58,6 @@ protected:
     size_t _num_nodes;
 
     std::vector<Node> _nodes;
-
-    std::vector<double> _outputs;
 
     std::string activation_function_str;
     std::function<double(double)> _activation_function;

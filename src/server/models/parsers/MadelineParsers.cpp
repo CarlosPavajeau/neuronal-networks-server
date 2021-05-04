@@ -42,7 +42,7 @@ void tag_invoke(const json::value_from_tag&, json::value& jv, MultiLayerPerceptr
 void tag_invoke(const boost::json::value_from_tag&, boost::json::value& jv, Layer const& layer)
 {
     jv = {
-            {"Nodes", json::value_from(layer.GetNeurons())}
+            {"Nodes", json::value_from(layer.GetNodes())}
     };
 }
 
