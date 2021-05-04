@@ -5,7 +5,7 @@
 #ifndef NEURONAL_NETWORKS_SERVER_LAYER_HPP
 #define NEURONAL_NETWORKS_SERVER_LAYER_HPP
 
-#include "Neuron.hpp"
+#include "Node.h"
 
 #include <list>
 #include <vector>
@@ -17,29 +17,55 @@ struct LayerCreateInfo
 public:
     int InputsNumber;
     int NeuronsNumber;
-    TriggerFunction* Trigger;
-    double TrainingRate;
+    std::string ActivationFunction;
 };
 
 class Layer
 {
 public:
-    explicit Layer(const LayerCreateInfo& layerCreateInfo);
+    explicit Layer(int num_inputs_per_node, int num_nodes, const std::string& activation_function);
 
-    std::vector<double> Output(const std::vector<double>& inputs);
+    ~Layer();
 
-    std::vector<double> GetOutputs() const { return _outputs; }
-
-    std::vector<Neuron> GetNeurons() const { return _neurons; }
-
-    Neuron& operator[](int index)
+    size_t GetInputSize() const
     {
-        return _neurons[index];
+        return _num_inputs_per_node;
     }
 
-private:
-    std::vector<Neuron> _neurons;
+    size_t GetOutputSize() const
+    {
+        return _num_nodes;
+    }
+    
+    std::vector<double> GetOutputs() const { return _outputs; }
+
+    void GetOutputAfterActivationFunction(const std::vector<double>& input, std::vector<double>* output) const;
+
+    const std::vector<Node>& GetNeurons() const { return _nodes; }
+
+    std::vector<Node>& GetNodesChangeable() { return _nodes; }
+
+    Node& operator[](int index)
+    {
+        return _nodes[index];
+    }
+
+    void UpdateWeights(const std::vector<double>& input_layer_activation, const std::vector<double>& d_error,
+                       double learning_rate, std::vector<double>* deltas);
+
+    void SetWeights(std::vector<std::vector<double>>& weights);
+
+protected:
+    size_t _num_inputs_per_node;
+    size_t _num_nodes;
+
+    std::vector<Node> _nodes;
+
     std::vector<double> _outputs;
+
+    std::string activation_function_str;
+    std::function<double(double)> _activation_function;
+    std::function<double(double)> _d_activation_function;
 };
 
 
