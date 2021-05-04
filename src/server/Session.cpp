@@ -44,7 +44,7 @@ void Session::Write(const Message& msg)
                              {
                                  if (!ec)
                                  {
-                                     OpcodeClient opcode = static_cast<OpcodeClient>(_write_msg.Opcode());
+                                     auto opcode = static_cast<OpcodeClient>(_write_msg.Opcode());
                                      std::cout << "[server]: Send opcode: " << GetOpcodeNameForLogging(opcode)
                                                << std::endl;
                                  } else
@@ -122,7 +122,8 @@ void Session::HandleInitMadeline(Message& message)
 
     const MadelineCreateInfo madelineCreateInfo = json::value_to<MadelineCreateInfo>(value);
 
-    _madeline = new MultiLayerPerceptron(madelineCreateInfo.NeuronsPerLayer, madelineCreateInfo.ActivationFunctions, this);
+    _madeline = new MultiLayerPerceptron(madelineCreateInfo.NeuronsPerLayer, madelineCreateInfo.ActivationFunctions,
+                                         this);
 
     Message responseMessage;
     responseMessage.Opcode(SMSG_INIT_MADELINE);
