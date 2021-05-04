@@ -5,12 +5,13 @@
 #ifndef NEURONAL_NETWORKS_SERVER_MADELINEMODELS_H
 #define NEURONAL_NETWORKS_SERVER_MADELINEMODELS_H
 
+#include "Define.hpp"
 #include <vector>
 
 struct MadelineCreateInfo
 {
 public:
-    MadelineCreateInfo(uint64_t inputs_number, const std::vector<uint64_t>& neurons_per_layer,
+    MadelineCreateInfo(uint64 inputs_number, const std::vector<uint64>& neurons_per_layer,
                        const std::vector<std::string>& activation_functions)
     {
         InputNumbers = inputs_number;
@@ -18,8 +19,8 @@ public:
         ActivationFunctions = activation_functions;
     }
 
-    uint64_t InputNumbers;
-    std::vector<uint64_t> NeuronsPerLayer;
+    uint64 InputNumbers;
+    std::vector<uint64> NeuronsPerLayer;
     std::vector<std::string> ActivationFunctions;
 };
 

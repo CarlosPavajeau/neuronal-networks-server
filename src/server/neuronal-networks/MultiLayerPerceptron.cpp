@@ -8,7 +8,7 @@
 
 #include <algorithm>
 
-MultiLayerPerceptron::MultiLayerPerceptron(const std::vector<uint64_t>& layers_nodes,
+MultiLayerPerceptron::MultiLayerPerceptron(const std::vector<uint64>& layers_nodes,
                                            const std::vector<std::string>& layers_act_funcs,
                                            Session* session) : _session(session)
 {
@@ -28,7 +28,7 @@ MultiLayerPerceptron::~MultiLayerPerceptron()
 }
 
 void
-MultiLayerPerceptron::Init(const std::vector<uint64_t>& layers_nodes, const std::vector<std::string>& layers_act_funcs)
+MultiLayerPerceptron::Init(const std::vector<uint64>& layers_nodes, const std::vector<std::string>& layers_act_funcs)
 {
     _layer_nodes = layers_nodes;
     _num_inputs = _layer_nodes[0];

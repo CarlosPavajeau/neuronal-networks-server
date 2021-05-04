@@ -61,7 +61,7 @@ void Session::WriteIterationError(double iteration_error)
 
     std::string message_str = std::to_string(iteration_error);
     const char* r_message = message_str.c_str();
-    
+
     response_message.BodyLength(std::strlen(r_message));
     std::memcpy(response_message.Body(), r_message, response_message.BodyLength());
     response_message.EncodeHeader();

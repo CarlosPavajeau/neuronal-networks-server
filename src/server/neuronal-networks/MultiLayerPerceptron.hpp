@@ -7,6 +7,7 @@
 
 #include "Layer.hpp"
 #include "MadelineModels.h"
+#include "Define.hpp"
 
 #include <vector>
 
@@ -17,7 +18,7 @@ class MultiLayerPerceptron
     friend class Session;
 
 public:
-    explicit MultiLayerPerceptron(const std::vector<uint64_t>& layers_nodes,
+    explicit MultiLayerPerceptron(const std::vector<uint64>& layers_nodes,
                                   const std::vector<std::string>& layers_act_funcs, Session* session);
 
     ~MultiLayerPerceptron();
@@ -42,12 +43,12 @@ protected:
                        double learning_rate);
 
 private:
-    void Init(const std::vector<uint64_t>& layers_nodes, const std::vector<std::string>& layers_act_funcs);
+    void Init(const std::vector<uint64>& layers_nodes, const std::vector<std::string>& layers_act_funcs);
 
     size_t _num_inputs;
     int _num_outputs, _num_hidden_layers;
 
-    std::vector<uint64_t> _layer_nodes;
+    std::vector<uint64> _layer_nodes;
     std::vector<Layer> _layers;
     Session* _session;
 };
