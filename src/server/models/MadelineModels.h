@@ -5,7 +5,6 @@
 #ifndef NEURONAL_NETWORKS_SERVER_MADELINEMODELS_H
 #define NEURONAL_NETWORKS_SERVER_MADELINEMODELS_H
 
-#include "TriggerFunction.hpp"
 #include <vector>
 
 struct MadelineCreateInfo
