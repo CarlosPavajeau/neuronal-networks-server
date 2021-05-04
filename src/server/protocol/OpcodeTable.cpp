@@ -108,6 +108,7 @@ void OpcodeTable::Initialize()
 
     DEFINE_HANDLER(CMSG_INIT_MADELINE, &Session::HandleInitMadeline);
     DEFINE_HANDLER(CMSG_TRAIN_MADELINE, &Session::HandleStartTrainingMadeline);
+    DEFINE_HANDLER(CMSG_SIMULATE_DATA, &Session::HandleSimulateData);
 
     DEFINE_SERVER_OP_CODE_HANDLER(SMSG_INIT_MADELINE);
 
