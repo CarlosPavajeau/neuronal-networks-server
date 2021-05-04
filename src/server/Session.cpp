@@ -54,6 +54,21 @@ void Session::Write(const Message& msg)
                              });
 }
 
+void Session::WriteIterationError(double iteration_error)
+{
+    Message response_message;
+    response_message.Opcode(SMSG_TRAIN_MADELINE);
+
+    std::string message_str = std::to_string(iteration_error);
+    const char* r_message = message_str.c_str();
+    
+    response_message.BodyLength(std::strlen(r_message));
+    std::memcpy(response_message.Body(), r_message, response_message.BodyLength());
+    response_message.EncodeHeader();
+
+    Write(response_message);
+}
+
 Message Session::ReadMessage() const
 {
     return _read_msg;
@@ -125,17 +140,7 @@ void Session::HandleInitMadeline(Message& message)
     _madeline = new MultiLayerPerceptron(madelineCreateInfo.NeuronsPerLayer, madelineCreateInfo.ActivationFunctions,
                                          this);
 
-    Message responseMessage;
-    responseMessage.Opcode(SMSG_INIT_MADELINE);
-
-    const char* r_message = "Init neuron success!";
-
-    responseMessage.BodyLength(std::strlen(r_message));
-    std::memcpy(responseMessage.Body(), r_message, responseMessage.BodyLength());
-
-    responseMessage.EncodeHeader();
-
-    Write(responseMessage);
+    OnInitMadeline();
 }
 
 void Session::HandleStartTrainingMadeline(Message& message)
@@ -189,4 +194,20 @@ void Session::HandleSimulateData(Message& message)
     {
         std::cout << "[server]: MultiLayerPerceptron not init!";
     }
+}
+
+void Session::OnInitMadeline()
+{
+    Message response_message;
+    response_message.Opcode(SMSG_INIT_MADELINE);
+
+    json::value value_to_send = json::value_from(*_madeline);
+    std::string message_str = json::serialize(value_to_send);
+
+    const char* r_message = message_str.c_str();
+    response_message.BodyLength(std::strlen(r_message));
+    std::memcpy(response_message.Body(), r_message, response_message.BodyLength());
+    response_message.EncodeHeader();
+
+    Write(response_message);
 }

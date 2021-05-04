@@ -25,6 +25,7 @@ public:
     void Start();
 
     void Write(const Message& msg);
+    void WriteIterationError(double iteration_error);
 
     Message ReadMessage() const;
 
@@ -40,6 +41,8 @@ private:
     void DoReadHeader();
 
     void DoReadBody();
+
+    void OnInitMadeline();
 
     tcp::socket _socket;
     Message _read_msg, _write_msg;

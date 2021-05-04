@@ -8,8 +8,9 @@
 
 #include <algorithm>
 
-MultiLayerPerceptron::MultiLayerPerceptron(const std::vector<uint64_t>& layers_nodes, const std::vector<std::string>& layers_act_funcs,
-                   Session* session) : _session(session)
+MultiLayerPerceptron::MultiLayerPerceptron(const std::vector<uint64_t>& layers_nodes,
+                                           const std::vector<std::string>& layers_act_funcs,
+                                           Session* session) : _session(session)
 {
     assert(layers_nodes.size() >= 2);
     assert(layers_act_funcs.size() + 1 == layers_nodes.size());
@@ -26,7 +27,8 @@ MultiLayerPerceptron::~MultiLayerPerceptron()
     _layers.clear();
 }
 
-void MultiLayerPerceptron::Init(const std::vector<uint64_t>& layers_nodes, const std::vector<std::string>& layers_act_funcs)
+void
+MultiLayerPerceptron::Init(const std::vector<uint64_t>& layers_nodes, const std::vector<std::string>& layers_act_funcs)
 {
     _layer_nodes = layers_nodes;
     _num_inputs = _layer_nodes[0];
@@ -40,7 +42,7 @@ void MultiLayerPerceptron::Init(const std::vector<uint64_t>& layers_nodes, const
 }
 
 void MultiLayerPerceptron::GetOutput(const std::vector<double>& input, std::vector<double>* output,
-                         std::vector<std::vector<double>>* all_layers_activations) const
+                                     std::vector<std::vector<double>>* all_layers_activations) const
 {
     assert(input.size() == _num_inputs);
 
@@ -95,7 +97,7 @@ void MultiLayerPerceptron::GetOutputClass(const std::vector<double>& output, siz
 }
 
 void MultiLayerPerceptron::UpdateWeights(const std::vector<std::vector<double>>& all_layers_activations,
-                             const std::vector<double>& error, double learning_rate)
+                                         const std::vector<double>& error, double learning_rate)
 {
     std::vector<double> temp_dev_error = error;
     std::vector<double> deltas{};
@@ -139,6 +141,14 @@ bool MultiLayerPerceptron::Train(const MadelineTrainingInfo& madelineTrainingInf
             }
 
             UpdateWeights(all_layers_activations, d_error_output, madelineTrainingInfo.LearningRate);
+        }
+
+        if (_session)
+        {
+            if ((i % (madelineTrainingInfo.MaxSteps / 10)) == 0)
+            {
+                _session->WriteIterationError(current_iteration_cost_function);
+            }
         }
 
         if (current_iteration_cost_function < madelineTrainingInfo.ErrorTolerance)
