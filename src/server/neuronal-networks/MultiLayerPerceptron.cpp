@@ -114,10 +114,9 @@ void MultiLayerPerceptron::UpdateWeights(const std::vector<std::vector<double>>&
 
 bool MultiLayerPerceptron::Train(const MadelineTrainingInfo& madelineTrainingInfo)
 {
-    int i = 0;
-    double current_iteration_cost_function = 0.0;
+    double current_iteration_cost_function;
 
-    for (i = 0; i < madelineTrainingInfo.MaxSteps; ++i)
+    for (int i = 0; i < madelineTrainingInfo.MaxSteps; ++i)
     {
         current_iteration_cost_function = 0.0;
 
