@@ -126,16 +126,16 @@ bool MultiLayerPerceptron::Train(const MadelineTrainingInfo& madelineTrainingInf
             std::vector<double> predicted_output;
             std::vector<std::vector<double>> all_layers_activations;
 
-            GetOutput(madelineTrainingInfo.Inputs[i], &predicted_output, &all_layers_activations);
+            GetOutput(madelineTrainingInfo.Inputs[j], &predicted_output, &all_layers_activations);
 
-            const std::vector<double>& correct_output = madelineTrainingInfo.Outputs[i];
+            const std::vector<double>& correct_output = madelineTrainingInfo.Outputs[j];
 
             assert(correct_output.size() == predicted_output.size());
 
             std::vector<double> d_error_output(predicted_output.size());
             for (size_t k = 0; k < predicted_output.size(); ++k)
             {
-                current_iteration_cost_function += std::pow(correct_output[k] - predicted_output[j], 2);
+                current_iteration_cost_function += std::pow(correct_output[k] - predicted_output[k], 2);
                 d_error_output[k] = -2 * (correct_output[k] - predicted_output[k]);
             }
 
