@@ -4,187 +4,179 @@
 
 #include "Madeline.hpp"
 #include "Session.hpp"
+#include "Utils.h"
 
 #include <algorithm>
 
-Madeline::Madeline(const MadelineCreateInfo& madelineCreateInfo, Session* session) : _session(session)
+Madeline::Madeline(const std::vector<uint64_t>& layers_nodes, const std::vector<std::string>& layers_act_funcs,
+                   Session* session) : _session(session)
 {
-    for (int i = 0; i < madelineCreateInfo.NeuronsPerLayer.size(); ++i)
+    assert(layers_nodes.size() >= 2);
+    assert(layers_act_funcs.size() + 1 == layers_nodes.size());
+
+    Init(layers_nodes, layers_act_funcs);
+}
+
+Madeline::~Madeline()
+{
+    _num_inputs = 0;
+    _num_outputs = 0;
+    _num_hidden_layers = 0;
+    _layer_nodes.clear();
+    _layers.clear();
+}
+
+void Madeline::Init(const std::vector<uint64_t>& layers_nodes, const std::vector<std::string>& layers_act_funcs)
+{
+    _layer_nodes = layers_nodes;
+    _num_inputs = _layer_nodes[0];
+    _num_inputs = _layer_nodes.back();
+    _num_hidden_layers = _layer_nodes.size() - 2;
+
+    for (size_t i = 0; i < _layer_nodes.size() - 1; ++i)
     {
-        LayerCreateInfo layerCreateInfo{
-                .InputsNumber = i == 0 ? madelineCreateInfo.InputNumbers
-                                       : madelineCreateInfo.NeuronsPerLayer[i - 1],
-                .NeuronsNumber = madelineCreateInfo.NeuronsPerLayer[i],
-                .Trigger = madelineCreateInfo.Triggers[i],
-                .TrainingRate = madelineCreateInfo.TrainingRate};
-        Layer layer(layerCreateInfo);
-        _layers.push_back(layer);
+        _layers.emplace_back(Layer(_layer_nodes[i], _layer_nodes[i + 1], layers_act_funcs[i]));
     }
 }
 
-std::vector<double> Madeline::Output(const std::vector<double>& inputs)
+void Madeline::GetOutput(const std::vector<double>& input, std::vector<double>* output,
+                         std::vector<std::vector<double>>* all_layers_activations) const
 {
-    std::vector<double> outputs = inputs;
-    for (auto& layer : _layers)
+    assert(input.size() == _num_inputs);
+
+    int temp_size;
+    if (_num_hidden_layers == 0)
     {
-        outputs = layer.Output(outputs);
+        temp_size = _num_outputs;
+    } else
+    {
+        temp_size = _layer_nodes[1];
     }
-    return outputs;
+
+    std::vector<double> temp_in(_num_inputs, 0.0);
+    std::vector<double> temp_out(temp_size, 0.0);
+
+    temp_in = input;
+
+    for (size_t i = 0; i < _layers.size(); ++i)
+    {
+        if (i > 0)
+        {
+            if (all_layers_activations != nullptr)
+            {
+                all_layers_activations->emplace_back(std::move(temp_in));
+            }
+
+            temp_in.clear();
+            temp_in = temp_out;
+            temp_out.clear();
+            temp_out.resize(_layers[i].GetOutputSize());
+        }
+
+        _layers[i].GetOutputAfterActivationFunction(temp_in, &temp_out);
+    }
+
+    if (temp_out.size() > 1)
+    {
+        Softmax(&temp_out);
+    }
+
+    *output = temp_out;
+
+    if (all_layers_activations != nullptr)
+    {
+        all_layers_activations->emplace_back(std::move(temp_in));
+    }
+}
+
+void Madeline::GetOutputClass(const std::vector<double>& output, size_t* class_id) const
+{
+    GetIdMaxElement(output, class_id);
+}
+
+void Madeline::UpdateWeights(const std::vector<std::vector<double>>& all_layers_activations,
+                             const std::vector<double>& error, double learning_rate)
+{
+    std::vector<double> temp_dev_error = error;
+    std::vector<double> deltas{};
+
+    for (int i = _num_hidden_layers; i >= 0; --i)
+    {
+        _layers[i].UpdateWeights(all_layers_activations[i], temp_dev_error, learning_rate, &deltas);
+        if (i > 0)
+        {
+            temp_dev_error.clear();
+            temp_dev_error = std::move(deltas);
+            deltas.clear();
+        }
+    }
 }
 
 bool Madeline::Train(const MadelineTrainingInfo& madelineTrainingInfo)
 {
-    bool sw = false;
-    int steps = 0;
+    int i = 0;
+    double current_iteration_cost_function = 0.0;
 
-    while (!sw && steps <= madelineTrainingInfo.MaxSteps)
+    for (i = 0; i < madelineTrainingInfo.MaxSteps; ++i)
     {
-        ++steps;
-        std::list<double> pattern_errors;
-        for (int i = 0; i < madelineTrainingInfo.Inputs.size(); ++i)
+        current_iteration_cost_function = 0.0;
+
+        for (size_t j = 0; j < madelineTrainingInfo.Inputs.size(); ++j)
         {
-            const auto& input = madelineTrainingInfo.Inputs[i];
-            const auto& expectedOutput = madelineTrainingInfo.Outputs[i];
+            std::vector<double> predicted_output;
+            std::vector<std::vector<double>> all_layers_activations;
 
-            // Get output and calculate linear and pattern errors
-            auto output = Output(input);
+            GetOutput(madelineTrainingInfo.Inputs[i], &predicted_output, &all_layers_activations);
 
-            std::vector<double> output_errors;
-            for (int j = 0; j < expectedOutput.size(); ++j)
+            const std::vector<double>& correct_output = madelineTrainingInfo.Outputs[i];
+
+            assert(correct_output.size() == predicted_output.size());
+
+            std::vector<double> d_error_output(predicted_output.size());
+            for (size_t k = 0; k < predicted_output.size(); ++k)
             {
-                double error = output[j] - expectedOutput[j];
-                output_errors.push_back(error);
+                current_iteration_cost_function += std::pow(correct_output[k] - predicted_output[j], 2);
+                d_error_output[k] = -2 * (correct_output[k] - predicted_output[k]);
             }
 
-            double pattern_error = 0.0;
-            std::for_each(output_errors.begin(), output_errors.end(),
-                          [&pattern_error](double error) { pattern_error += std::abs(error); });
-            pattern_errors.push_back(pattern_error);
-
-            auto output_layer = _layers.back();
-            for (int j = 0; j < output_errors.size(); ++j)
-            {
-                output_layer[j].SetError(output_errors[j]);
-            }
-
-            // Calculate layer errors
-            for (int j = _layers.size() - 2; j >= 0; --j)
-            {
-                for (int k = 0; k < _layers[j].GetNeurons().size(); ++k)
-                {
-                    double error = 0.0;
-                    for (int l = 0; l < _layers[j + 1].GetNeurons().size(); ++l)
-                    {
-                        const auto& neuron = _layers[j + 1][l];
-                        error += neuron.GetError() * neuron.GetWeights()[k];
-                    }
-
-                    _layers[j][k].SetError(error);
-                }
-            }
-
-            // Learn with delta rule
-            for (int j = 0; j < _layers.size(); ++j)
-            {
-                for (auto& neuron : _layers[j].GetNeurons())
-                {
-                    neuron.Learn(j == 0 ? input : _layers[j - 1].GetOutputs(), neuron.GetError());
-                }
-            }
-
-            // Temporary/permanent modification of weights
-            for (int j = _layers.size(); j >= 0; --j)
-            {
-                int neurons_to_take = 1;
-                auto not_visited = [](const Neuron& neuron) { return !neuron.IsVisited(); };
-                bool all_neurons_visited = std::any_of(_layers[j].GetNeurons().begin(), _layers[j].GetNeurons().end(),
-                                                       not_visited);
-                while (!all_neurons_visited)
-                {
-                    auto available_neurons = std::vector<Neuron>();
-                    std::copy_if(_layers[j].GetNeurons().begin(),
-                                 _layers[j].GetNeurons().end(),
-                                 available_neurons.begin(),
-                                 [](const Neuron& neuron) { return !neuron.IsLock(); });
-
-                    auto take_neurons = std::vector<Neuron>(
-                            neurons_to_take <= available_neurons.size() ? neurons_to_take : available_neurons.size());
-                    std::partial_sort_copy(available_neurons.begin(), available_neurons.end(), take_neurons.begin(),
-                                           take_neurons.end(), [](const Neuron& a, const Neuron& b)
-                                           {
-                                               return a.GetError() < b.GetError();
-                                           });
-
-                    for (auto& neuron : take_neurons)
-                    {
-                        neuron.Visited();
-                        neuron.Learn(j == 0 ? input : _layers[j - 1].GetOutputs(), neuron.GetError());
-                    }
-
-                    auto new_output = Output(input);
-                    std::vector<double> new_output_errors;
-                    for (int k = 0; k < expectedOutput.size(); ++k)
-                    {
-                        double error = new_output[k] - expectedOutput[k];
-                        new_output_errors.push_back(error);
-                    }
-
-                    for (int k = 0; k < new_output_errors.size(); ++k)
-                    {
-                        output_layer[k].SetNewError(new_output_errors[k]);
-                    }
-
-                    for (int k = _layers.size() - 2; k >= 0; --k)
-                    {
-                        for (int l = 0; l < _layers[k].GetNeurons().size(); ++l)
-                        {
-                            double error = 0.0;
-                            for (int m = 0; m < _layers[k + 1].GetNeurons().size(); ++m)
-                            {
-                                const auto& neuron = _layers[k + 1][m];
-                                error += neuron.GetNewError() * neuron.GetWeights()[l];
-                            }
-
-                            _layers[k][l].SetNewError(error);
-                        }
-                    }
-
-                    for (auto& neuron : take_neurons)
-                    {
-                        if (neuron.GetNewError() > neuron.GetError())
-                        {
-                            neuron.ResetWeightsAndSill();
-                        } else
-                        {
-                            neuron.Lock();
-                        }
-                    }
-
-                    ++neurons_to_take;
-                    all_neurons_visited = std::any_of(_layers[j].GetNeurons().begin(), _layers[j].GetNeurons().end(),
-                                                      not_visited);
-                }
-            }
-
-            for (auto& layer : _layers)
-            {
-                for (auto& neuron : layer.GetNeurons())
-                {
-                    neuron.UnLock();
-                    neuron.UnVisited();
-                }
-            }
+            UpdateWeights(all_layers_activations, d_error_output, madelineTrainingInfo.LearningRate);
         }
 
-        double iterationError = 0.0;
-        for (const auto& patternError : pattern_errors)
+        if (current_iteration_cost_function < madelineTrainingInfo.ErrorTolerance)
         {
-            iterationError += patternError;
+            return true;
         }
-        iterationError /= pattern_errors.size();
-        std::cout << "[server]: Iteration error " << iterationError << std::endl;
-        sw = iterationError <= madelineTrainingInfo.ErrorTolerance;
     }
 
     return false;
+}
+
+std::vector<std::vector<double>> Madeline::GetLayerWeights(size_t layer_i)
+{
+    std::vector<std::vector<double>> ret_val;
+
+    if (0 <= layer_i && layer_i < _layer_nodes.size())
+    {
+        Layer current_layer = _layers[layer_i];
+        for (Node& node : current_layer.GetNodesChangeable())
+        {
+            ret_val.push_back(node.GetWeights());
+        }
+
+        return ret_val;
+    } else
+    {
+        throw std::logic_error("Incorrect layer number in GetLayerWeights call");
+    }
+}
+
+void Madeline::SetLayerWeights(size_t layer_i, std::vector<std::vector<double>>& weights)
+{
+    if (0 <= layer_i && layer_i < _layers.size())
+    {
+        _layers[layer_i].SetWeights(weights);
+    } else
+    {
+        throw std::logic_error("Incorrect layer number in SetLayerWeights call");
+    }
 }

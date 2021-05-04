@@ -17,15 +17,36 @@ class Madeline
     friend class Session;
 
 public:
-    explicit Madeline(const MadelineCreateInfo& madelineCreateInfo, Session* session);
+    explicit Madeline(const std::vector<uint64_t>& layers_nodes, const std::vector<std::string>& layers_act_funcs, Session* session);
 
-    std::vector<double> Output(const std::vector<double>& inputs);
+    ~Madeline();
+
+    void GetOutput(const std::vector<double>& input, std::vector<double>* output,
+                   std::vector<std::vector<double>>* all_layers_activations = nullptr) const;
+
+    void GetOutputClass(const std::vector<double>& output, size_t* class_id) const;
 
     bool Train(const MadelineTrainingInfo& madelineTrainingInfo);
 
+    size_t GetNumLayers() { return _layers.size(); }
+
+    std::vector<std::vector<double>> GetLayerWeights(size_t layer_i);
+
+    void SetLayerWeights(size_t layer_i, std::vector<std::vector<double>>& weights);
+
     std::vector<Layer> GetLayers() const { return _layers; }
 
+protected:
+    void UpdateWeights(const std::vector<std::vector<double>>& all_layers_activations, const std::vector<double>& error,
+                       double learning_rate);
+
 private:
+    void Init(const std::vector<uint64_t>& layers_nodes, const std::vector<std::string>& layers_act_funcs);
+
+    size_t _num_inputs;
+    int _num_outputs, _num_hidden_layers;
+
+    std::vector<uint64_t> _layer_nodes;
     std::vector<Layer> _layers;
     Session* _session;
 };
