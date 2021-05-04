@@ -20,6 +20,8 @@ class Session : public std::enable_shared_from_this<Session>
 public:
     explicit Session(tcp::socket socket);
 
+    ~Session();
+
     void Start();
 
     void Write(const Message& msg);
@@ -31,6 +33,8 @@ public:
     void HandleInitMadeline(Message& message);
 
     void HandleStartTrainingMadeline(Message& message);
+
+    void HandleSimulateData(Message& message);
 
 private:
     void DoReadHeader();

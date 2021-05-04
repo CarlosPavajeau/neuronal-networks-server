@@ -18,6 +18,16 @@ Session::Session(tcp::socket socket) : _socket(std::move(socket)), _madeline(nul
 
 }
 
+Session::~Session()
+{
+    if (!_madeline)
+    {
+        return;
+    }
+
+    delete _madeline;
+}
+
 void Session::Start()
 {
     DoReadHeader();
@@ -84,6 +94,10 @@ void Session::DoReadBody()
                                     if (ClientOpcodeHandler const* opHandle = opcodeTable[opcode])
                                     {
                                         opHandle->Call(this, _read_msg);
+                                    } else
+                                    {
+                                        std::cout << "[server]: A handler has not been defined for the opcode: "
+                                                  << GetOpcodeNameForLogging(opcode) << std::endl;
                                     }
 
                                     DoReadHeader();
@@ -108,14 +122,12 @@ void Session::HandleInitMadeline(Message& message)
 
     const MadelineCreateInfo madelineCreateInfo = json::value_to<MadelineCreateInfo>(value);
 
-    _madeline = new Madeline(madelineCreateInfo, this);
+    _madeline = new Madeline(madelineCreateInfo.NeuronsPerLayer, madelineCreateInfo.ActivationFunctions, this);
 
     Message responseMessage;
     responseMessage.Opcode(SMSG_INIT_MADELINE);
 
-    json::value responseValue = json::value_from(*_madeline);
-    std::string responseStr = json::serialize(responseValue);
-    const char* r_message = responseStr.c_str();
+    const char* r_message = "Init neuron success!";
 
     responseMessage.BodyLength(std::strlen(r_message));
     std::memcpy(responseMessage.Body(), r_message, responseMessage.BodyLength());
@@ -137,7 +149,43 @@ void Session::HandleStartTrainingMadeline(Message& message)
     {
         if (_madeline->Train(madelineTrainingInfo))
         {
-            std::cout << "[server]: Training success!";
+            std::cout << "[server]: Training success!" << std::endl;
         }
+    } else
+    {
+        std::cout << "[server]: Madeline not init" << std::endl;
+    }
+}
+
+void Session::HandleSimulateData(Message& message)
+{
+    json::parser parser;
+    parser.write(message.Body(), message.BodyLength());
+    json::value value = parser.release();
+
+    const std::vector<double> inputs = json::value_to<std::vector<double>>(value);
+    std::vector<double> outputs;
+
+    if (_madeline)
+    {
+        _madeline->GetOutput(inputs, &outputs);
+
+        Message responseMessage;
+        responseMessage.Opcode(SMSG_SIMULATE_DATA);
+
+        json::value responseValue = json::value_from(outputs);
+        std::string response_str = json::serialize(responseValue);
+
+        const char* r_message = response_str.c_str();
+
+        responseMessage.BodyLength(std::strlen(r_message));
+        std::memcpy(responseMessage.Body(), r_message, responseMessage.BodyLength());
+
+        responseMessage.EncodeHeader();
+
+        Write(responseMessage);
+    } else
+    {
+        std::cout << "[server]: Madeline not init!";
     }
 }
