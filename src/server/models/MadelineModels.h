@@ -11,28 +11,37 @@
 struct MadelineCreateInfo
 {
 public:
-    MadelineCreateInfo(int inputNumbers, std::vector<int> neuronsPerLayer, std::vector<TriggerFunction*> triggers,
-                       double trainingRate) : InputNumbers(inputNumbers), NeuronsPerLayer(std::move(neuronsPerLayer)),
-                                              Triggers(std::move(triggers)), TrainingRate(trainingRate) {}
+    MadelineCreateInfo(uint64_t inputs_number, const std::vector<uint64_t>& neurons_per_layer,
+                       const std::vector<std::string>& activation_functions)
+    {
+        InputNumbers = inputs_number;
+        NeuronsPerLayer = neurons_per_layer;
+        ActivationFunctions = activation_functions;
+    }
 
-    int InputNumbers{};
-    std::vector<int> NeuronsPerLayer;
-    std::vector<TriggerFunction*> Triggers;
-    double TrainingRate{};
+    uint64_t InputNumbers;
+    std::vector<uint64_t> NeuronsPerLayer;
+    std::vector<std::string> ActivationFunctions;
 };
 
 struct MadelineTrainingInfo
 {
 public:
     MadelineTrainingInfo(std::vector<std::vector<double>> inputs, std::vector<std::vector<double>> outputs,
-                         double errorTolerance, int maxSteps) : Inputs(std::move(inputs)),
-                                                                Outputs(std::move(outputs)),
-                                                                ErrorTolerance(errorTolerance),
-                                                                MaxSteps(maxSteps) {}
+                         double error_tolerance, double learning_rate, int max_steps)
+    {
+        Inputs = std::move(inputs);
+        Outputs = std::move(outputs);
+
+        ErrorTolerance = error_tolerance;
+        LearningRate = learning_rate;
+        MaxSteps = max_steps;
+    }
 
     std::vector<std::vector<double>> Inputs;
     std::vector<std::vector<double>> Outputs;
     double ErrorTolerance;
+    double LearningRate;
     int MaxSteps;
 };
 

@@ -14,6 +14,8 @@ class Layer;
 
 class Neuron;
 
+class Node;
+
 namespace boost
 {
     namespace json
@@ -36,6 +38,6 @@ void tag_invoke(const boost::json::value_from_tag&, boost::json::value& jv, Made
 
 void tag_invoke(const boost::json::value_from_tag&, boost::json::value& jv, Layer const& layer);
 
-void tag_invoke(const boost::json::value_from_tag&, boost::json::value& jv, Neuron const& neuron);
+void tag_invoke(const boost::json::value_from_tag&, boost::json::value& jv, Node const& node);
 
 #endif //NEURONAL_NETWORKS_SERVER_MADELINEPARSERS_H
