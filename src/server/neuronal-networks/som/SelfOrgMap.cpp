@@ -41,7 +41,7 @@ bool SelfOrgMap::Train(const SelfOrgMapTrainingInfo& madelineTrainingInfo)
             double winner_dist = 999;
             for (int k = 0; k < _som.size(); ++k)
             {
-                euclidean_distances.resize(_som[k].size());
+                euclidean_distances[k].resize(_som[k].size());
                 for (int l = 0; l < _som[k].size(); ++l)
                 {
                     euclidean_distances[k][l] = _som[k][l].GetEuclideanDistance(madelineTrainingInfo.Inputs[j]);
@@ -92,4 +92,33 @@ bool SelfOrgMap::Train(const SelfOrgMapTrainingInfo& madelineTrainingInfo)
     }
 
     return false;
+}
+
+void SelfOrgMap::GetOutput(const std::vector<double>& input, std::vector<double>* output) const
+{
+    std::vector<std::vector<double>> euclidean_distances;
+    euclidean_distances.resize(_som.size());
+    int minX, minY;
+    double winner_dist = 999;
+
+    for (int k = 0; k < _som.size(); ++k)
+    {
+        euclidean_distances[k].resize(_som[k].size());
+        for (int l = 0; l < _som[k].size(); ++l)
+        {
+            euclidean_distances[k][l] = _som[k][l].GetEuclideanDistance(input);
+            if (euclidean_distances[k][l] < winner_dist)
+            {
+                winner_dist = euclidean_distances[k][l];
+                minX = k;
+                minY = l;
+            }
+        }
+    }
+
+    output->resize(_som[minX][minY].GetWeightsVectorSize());
+    for (int i = 0; i < _som[minX][minY].GetWeightsVectorSize(); ++i)
+    {
+        (*output)[i] = _som[minX][minY].GetWeights()[i];
+    }
 }

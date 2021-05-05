@@ -21,6 +21,8 @@ public:
 
     bool Train(const SelfOrgMapTrainingInfo& madelineTrainingInfo);
 
+    void GetOutput(const std::vector<double>& input, std::vector<double>* output) const;
+
 protected:
     std::vector<std::vector<SomNode>> _som;
     Session* _session;
