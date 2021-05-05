@@ -31,7 +31,7 @@ public:
 
     void SetY(uint64 new_y) { _coordinate.X = new_y; }
 
-    double GetEuclideanDistance(std::vector<double> inputs);
+    double GetEuclideanDistance(std::vector<double> inputs) const;
 
     void UpdateWeights(double learning_rate, double winner_distance);
 

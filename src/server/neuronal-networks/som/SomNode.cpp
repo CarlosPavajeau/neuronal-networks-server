@@ -25,7 +25,7 @@ void SomNode::SetCoordinate(uint64 x, uint64 y)
     _coordinate = Point(x, y);
 }
 
-double SomNode::GetEuclideanDistance(std::vector<double> inputs)
+double SomNode::GetEuclideanDistance(std::vector<double> inputs) const
 {
     assert(inputs.size() == _weights.size());
 
