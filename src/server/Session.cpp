@@ -5,15 +5,17 @@
 #include "Session.hpp"
 #include "Message.hpp"
 #include "MultiLayerPerceptron.hpp"
+#include "SelfOrgMap.h"
 #include "Opcodes.hpp"
 #include "OpcodeTable.h"
 #include "MadelineParsers.h"
+#include "SelfOrgMapParsers.h"
 
 #include <boost/json/src.hpp>
 
 namespace json = boost::json;
 
-Session::Session(tcp::socket socket) : _socket(std::move(socket)), _madeline(nullptr)
+Session::Session(tcp::socket socket) : _socket(std::move(socket)), _madeline(nullptr), _self_org_map(nullptr)
 {
 
 }
@@ -163,7 +165,7 @@ void Session::HandleStartTrainingMadeline(Message& message)
     }
 }
 
-void Session::HandleSimulateData(Message& message)
+void Session::HandleSimulateDataMadeline(Message& message)
 {
     json::parser parser;
     parser.write(message.Body(), message.BodyLength());
@@ -177,7 +179,7 @@ void Session::HandleSimulateData(Message& message)
         _madeline->GetOutput(inputs, &outputs);
 
         Message responseMessage;
-        responseMessage.Opcode(SMSG_SIMULATE_DATA);
+        responseMessage.Opcode(SMSG_SIMULATE_DATA_MADELINE);
 
         json::value responseValue = json::value_from(outputs);
         std::string response_str = json::serialize(responseValue);
@@ -205,6 +207,86 @@ void Session::OnInitMadeline()
     std::string message_str = json::serialize(value_to_send);
 
     const char* r_message = message_str.c_str();
+    response_message.BodyLength(std::strlen(r_message));
+    std::memcpy(response_message.Body(), r_message, response_message.BodyLength());
+    response_message.EncodeHeader();
+
+    Write(response_message);
+}
+
+void Session::HandleInitSelfOrgMap(Message& message)
+{
+    json::parser parser;
+    parser.write(message.Body(), message.BodyLength());
+    json::value value = parser.release();
+
+    const SelfOrgMapCreateInfo createInfo = json::value_to<SelfOrgMapCreateInfo>(value);
+
+    _self_org_map = new SelfOrgMap(createInfo.Width, createInfo.Height, createInfo.InputNumbers, createInfo.Delta,
+                                   createInfo.ToughCompetition, this);
+
+    OnInitSelfOrgMap();
+}
+
+void Session::HandleStartTrainingSelfOrgMap(Message& message)
+{
+    if (_self_org_map)
+    {
+        json::parser parser;
+        parser.write(message.Body(), message.BodyLength());
+        json::value value = parser.release();
+
+        const SelfOrgMapTrainingInfo trainingInfo = json::value_to<SelfOrgMapTrainingInfo>(value);
+
+        if (_self_org_map->Train(trainingInfo))
+        {
+            std::cout << "[server]: Training success!" << std::endl;
+        }
+    } else
+    {
+        std::cout << "[server]: SelfOrgMap not init!" << std::endl;
+    }
+}
+
+void Session::HandleSimulateDataSelfOrgMap(Message& message)
+{
+    json::parser parser;
+    parser.write(message.Body(), message.BodyLength());
+    json::value value = parser.release();
+
+    const std::vector<double> inputs = json::value_to<std::vector<double>>(value);
+    std::vector<double> outputs;
+
+    if (_self_org_map)
+    {
+        _self_org_map->GetOutput(inputs, &outputs);
+
+        Message responseMessage;
+        responseMessage.Opcode(SMSG_SIMULATE_DATA_SELF_ORG_MAP);
+
+        json::value responseValue = json::value_from(outputs);
+        std::string response_str = json::serialize(responseValue);
+
+        const char* r_message = response_str.c_str();
+
+        responseMessage.BodyLength(std::strlen(r_message));
+        std::memcpy(responseMessage.Body(), r_message, responseMessage.BodyLength());
+
+        responseMessage.EncodeHeader();
+
+        Write(responseMessage);
+    } else
+    {
+        std::cout << "[server]: MultiLayerPerceptron not init!";
+    }
+}
+
+void Session::OnInitSelfOrgMap()
+{
+    Message response_message;
+    response_message.Opcode(SMSG_INIT_SELF_ORG_MAP);
+
+    const char* r_message = "Init SelfOrgMap";
     response_message.BodyLength(std::strlen(r_message));
     std::memcpy(response_message.Body(), r_message, response_message.BodyLength());
     response_message.EncodeHeader();
