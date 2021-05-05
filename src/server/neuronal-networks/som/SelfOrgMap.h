@@ -7,7 +7,7 @@
 
 #include "Define.hpp"
 #include "SomNode.h"
-#include "MadelineModels.h"
+#include "SelfOrgMapModels.h"
 
 #include <vector>
 
@@ -19,7 +19,7 @@ public:
     explicit SelfOrgMap(uint64 width, uint64 height, int num_inputs, double delta, bool tough_competition,
                         Session* session);
 
-    bool Train(const MadelineTrainingInfo& madelineTrainingInfo);
+    bool Train(const SelfOrgMapTrainingInfo& madelineTrainingInfo);
 
 protected:
     std::vector<std::vector<SomNode>> _som;

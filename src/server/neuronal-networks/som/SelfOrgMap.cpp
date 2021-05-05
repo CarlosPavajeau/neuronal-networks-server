@@ -20,7 +20,7 @@ SelfOrgMap::SelfOrgMap(uint64 width, uint64 height, int num_inputs, double delta
     }
 }
 
-bool SelfOrgMap::Train(const MadelineTrainingInfo& madelineTrainingInfo)
+bool SelfOrgMap::Train(const SelfOrgMapTrainingInfo& madelineTrainingInfo)
 {
     double current_iteration_cost_function;
     double learning_rate = madelineTrainingInfo.LearningRate;
