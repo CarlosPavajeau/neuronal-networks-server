@@ -5,6 +5,8 @@
 #ifndef NEURONAL_NETWORKS_SERVER_UTILS_H
 #define NEURONAL_NETWORKS_SERVER_UTILS_H
 
+#include "Define.hpp"
+
 #include <cmath>
 #include <string>
 #include <functional>
@@ -40,6 +42,16 @@ inline double d_linear(double x)
 {
     return 1;
 }
+
+struct Point
+{
+public:
+    Point(uint64 x, uint64 y) : X(x), Y(y) {}
+
+    Point() : X(0), Y(0) {}
+
+    uint64 X, Y;
+};
 
 class ActivationFunctionsMgr
 {
