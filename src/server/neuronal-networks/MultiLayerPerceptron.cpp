@@ -147,7 +147,7 @@ bool MultiLayerPerceptron::Train(const MadelineTrainingInfo& madelineTrainingInf
         {
             if ((i % (madelineTrainingInfo.MaxSteps / 10)) == 0)
             {
-                _session->WriteIterationError(current_iteration_cost_function);
+                _session->WriteIterationError(SMSG_TRAIN_MADELINE, current_iteration_cost_function);
             }
         }
 

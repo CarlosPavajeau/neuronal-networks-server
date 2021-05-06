@@ -56,10 +56,10 @@ void Session::Write(const Message& msg)
                              });
 }
 
-void Session::WriteIterationError(double iteration_error)
+void Session::WriteIterationError(Opcodes opcode, double iteration_error)
 {
     Message response_message;
-    response_message.Opcode(SMSG_TRAIN_MADELINE);
+    response_message.Opcode(opcode);
 
     std::string message_str = std::to_string(iteration_error);
     const char* r_message = message_str.c_str();
@@ -241,6 +241,9 @@ void Session::HandleStartTrainingSelfOrgMap(Message& message)
         if (_self_org_map->Train(trainingInfo))
         {
             std::cout << "[server]: Training success!" << std::endl;
+        } else
+        {
+            std::cout << "[server]: Not training!" << std::endl;
         }
     } else
     {

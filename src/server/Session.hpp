@@ -6,6 +6,7 @@
 #define NEURONAL_NETWORKS_SERVER_SESSION_HPP
 
 #include "Message.hpp"
+#include "Opcodes.hpp"
 
 #include <memory>
 #include <iostream>
@@ -28,7 +29,7 @@ public:
 
     void Write(const Message& msg);
 
-    void WriteIterationError(double iteration_error);
+    void WriteIterationError(Opcodes opcode, double iteration_error);
 
     Message ReadMessage() const;
 
