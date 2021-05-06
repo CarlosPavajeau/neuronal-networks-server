@@ -70,16 +70,15 @@ bool SelfOrgMap::Train(const SelfOrgMapTrainingInfo& trainingInfo)
 
         learning_rate = trainingInfo.LearningRate * exp(-(double) (i + 1) / trainingInfo.MaxSteps);
 
-        /*if (_session)
+        if (_session)
         {
             if ((i % (trainingInfo.MaxSteps / 10)) == 0)
             {
                 _session->WriteIterationError(current_iteration_cost_function);
             }
-        }*/
+        }
 
-        current_iteration_cost_function /= trainingInfo.Inputs.size();
-        std::cout << current_iteration_cost_function << std::endl;
+        current_iteration_cost_function /= (double) trainingInfo.Inputs.size();
         if (current_iteration_cost_function <= trainingInfo.ErrorTolerance)
         {
             return true;
