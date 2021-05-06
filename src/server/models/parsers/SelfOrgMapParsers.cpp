@@ -5,6 +5,8 @@
 #include "SelfOrgMapParsers.h"
 #include "SelfOrgMapModels.h"
 
+#include "SelfOrgMap.h"
+
 #include <vector>
 #include <boost/json.hpp>
 
@@ -40,4 +42,27 @@ tag_invoke(const boost::json::value_to_tag<SelfOrgMapTrainingInfo>&, const boost
     auto inputs = json::value_to<std::vector<std::vector<double>>>(value.at("Inputs"));
 
     return SelfOrgMapTrainingInfo(inputs, error_tolerance, learning_rate, max_steps);
+}
+
+void tag_invoke(const boost::json::value_from_tag&, boost::json::value& jv, SelfOrgMap const& selfOrgMap)
+{
+    jv = {
+            {"Map", json::value_from(selfOrgMap.GetMap())}
+    };
+}
+
+void tag_invoke(const boost::json::value_from_tag&, boost::json::value& jv, SomNode const& somNode)
+{
+    jv = {
+            {"Point",   json::value_from(somNode.GetCoordinate())},
+            {"Weights", json::value_from(somNode.GetWeights())},
+    };
+}
+
+void tag_invoke(const boost::json::value_from_tag&, boost::json::value& jv, Point const& point)
+{
+    jv = {
+            {"X", point.X},
+            {"Y", point.Y}
+    };
 }

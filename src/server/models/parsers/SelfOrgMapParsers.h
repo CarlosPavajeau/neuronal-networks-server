@@ -7,6 +7,11 @@
 
 struct SelfOrgMapCreateInfo;
 struct SelfOrgMapTrainingInfo;
+struct Point;
+
+class SelfOrgMap;
+
+class SomNode;
 
 namespace boost
 {
@@ -27,5 +32,9 @@ tag_invoke(const boost::json::value_to_tag<SelfOrgMapCreateInfo>&, const boost::
 SelfOrgMapTrainingInfo
 tag_invoke(const boost::json::value_to_tag<SelfOrgMapTrainingInfo>&, const boost::json::value& value);
 
+void tag_invoke(const boost::json::value_from_tag&, boost::json::value& jv, SelfOrgMap const& selfOrgMap);
+
+void tag_invoke(const boost::json::value_from_tag&, boost::json::value& jv, SomNode const& somNode);
+void tag_invoke(const boost::json::value_from_tag&, boost::json::value& jv, Point const& point);
 
 #endif //NEURONAL_NETWORKS_SERVER_SELFORGMAPPARSERS_H
