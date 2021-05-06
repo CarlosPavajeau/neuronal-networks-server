@@ -31,9 +31,10 @@ public:
 
     void SetY(uint64 new_y) { _coordinate.X = new_y; }
 
-    double GetEuclideanDistance(std::vector<double> inputs) const;
+    double GetEuclideanDistance(const std::vector<double>& inputs) const;
+    double GetDistance(const SomNode& node) const;
 
-    void UpdateWeights(double learning_rate, double winner_distance);
+    void UpdateWeights(const std::vector<double>& inputs, double learning_rate, double winner_distance) override;
 
 protected:
     Point _coordinate;

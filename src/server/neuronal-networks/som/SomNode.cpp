@@ -25,7 +25,7 @@ void SomNode::SetCoordinate(uint64 x, uint64 y)
     _coordinate = Point(x, y);
 }
 
-double SomNode::GetEuclideanDistance(std::vector<double> inputs) const
+double SomNode::GetEuclideanDistance(const std::vector<double>& inputs) const
 {
     assert(inputs.size() == _weights.size());
 
@@ -38,10 +38,18 @@ double SomNode::GetEuclideanDistance(std::vector<double> inputs) const
     return std::sqrt(distance);
 }
 
-void SomNode::UpdateWeights(double learning_rate, double winner_distance)
+void SomNode::UpdateWeights(const std::vector<double>& inputs, double learning_rate, double winner_distance)
 {
-    for (double& _weight : _weights)
+    for (int i = 0; i < _weights.size(); ++i)
     {
-        _weight += learning_rate * winner_distance;
+        _weights[i] += learning_rate * winner_distance * (inputs[i] - _weights[i]);
     }
+}
+
+double SomNode::GetDistance(const SomNode& node) const
+{
+    double diff_x = (double) GetX() - (double) node.GetX();
+    double diff_y = (double) GetY() - (double) node.GetY();
+
+    return std::pow(diff_x, 2) + std::pow(diff_y, 2);
 }

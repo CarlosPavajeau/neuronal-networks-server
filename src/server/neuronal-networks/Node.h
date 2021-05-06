@@ -61,7 +61,7 @@ public:
                                           std::function<double(double)> activation_function,
                                           double* output) const;
 
-    void UpdateWeights(const std::vector<double>& x, double error, double learning_rate);
+    virtual void UpdateWeights(const std::vector<double>& x, double error, double learning_rate);
 
     void UpdateWeight(int weight_id, double increment, double learning_rate);
 
