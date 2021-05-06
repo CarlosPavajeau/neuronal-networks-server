@@ -27,6 +27,8 @@ public:
 
     BestValue GetBest(const std::vector<double>& input) const;
 
+    std::vector<std::vector<SomNode>> GetMap() const { return _som; }
+
 protected:
     std::vector<std::vector<SomNode>> _som;
     Session* _session;

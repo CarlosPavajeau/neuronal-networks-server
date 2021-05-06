@@ -289,7 +289,10 @@ void Session::OnInitSelfOrgMap()
     Message response_message;
     response_message.Opcode(SMSG_INIT_SELF_ORG_MAP);
 
-    const char* r_message = "Init SelfOrgMap";
+    json::value value_to_send = json::value_from(*_self_org_map);
+    std::string response_str = json::serialize(value_to_send);
+
+    const char* r_message = response_str.c_str();
     response_message.BodyLength(std::strlen(r_message));
     std::memcpy(response_message.Body(), r_message, response_message.BodyLength());
     response_message.EncodeHeader();
