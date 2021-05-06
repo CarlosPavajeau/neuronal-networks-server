@@ -13,20 +13,26 @@
 
 class Session;
 
+typedef std::pair<Point, double> BestValue;
+
 class SelfOrgMap
 {
 public:
     explicit SelfOrgMap(uint64 width, uint64 height, int num_inputs, double delta, bool tough_competition,
                         Session* session);
 
-    bool Train(const SelfOrgMapTrainingInfo& madelineTrainingInfo);
+    bool Train(const SelfOrgMapTrainingInfo& trainingInfo);
 
     void GetOutput(const std::vector<double>& input, std::vector<double>* output) const;
+
+    BestValue GetBest(const std::vector<double>& input) const;
 
 protected:
     std::vector<std::vector<SomNode>> _som;
     Session* _session;
     double _delta;
+    uint64 _width, _height;
+    double _radius;
     bool _tough_competition;
 };
 

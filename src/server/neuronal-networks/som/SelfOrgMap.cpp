@@ -8,6 +8,10 @@
 SelfOrgMap::SelfOrgMap(uint64 width, uint64 height, int num_inputs, double delta, bool tough_competition,
                        Session* session) : _session(session), _tough_competition(tough_competition), _delta(delta)
 {
+    _width = width;
+    _height = height;
+    _radius = (double) std::max(height, width) / 2.0;
+
     for (int x = 0; x < width; ++x)
     {
         std::vector<SomNode> nodes;
@@ -20,72 +24,63 @@ SelfOrgMap::SelfOrgMap(uint64 width, uint64 height, int num_inputs, double delta
     }
 }
 
-bool SelfOrgMap::Train(const SelfOrgMapTrainingInfo& madelineTrainingInfo)
+bool SelfOrgMap::Train(const SelfOrgMapTrainingInfo& trainingInfo)
 {
     double current_iteration_cost_function;
-    double learning_rate = madelineTrainingInfo.LearningRate;
+    double learning_rate = trainingInfo.LearningRate;
 
-    for (int i = 0; i < madelineTrainingInfo.MaxSteps; ++i)
+    for (int i = 0; i < trainingInfo.MaxSteps; ++i)
     {
-        if (i > 1)
-        {
-            learning_rate /= i;
-        }
-
         current_iteration_cost_function = 0.0;
-        for (size_t j = 0; j < madelineTrainingInfo.Inputs.size(); ++j)
+        for (size_t j = 0; j < trainingInfo.Inputs.size(); ++j)
         {
-            std::vector<std::vector<double>> euclidean_distances;
-            euclidean_distances.resize(_som.size());
-            int minX, minY;
-            double winner_dist = 999;
-            for (int k = 0; k < _som.size(); ++k)
-            {
-                euclidean_distances[k].resize(_som[k].size());
-                for (int l = 0; l < _som[k].size(); ++l)
-                {
-                    euclidean_distances[k][l] = _som[k][l].GetEuclideanDistance(madelineTrainingInfo.Inputs[j]);
-                    if (euclidean_distances[k][l] < winner_dist)
-                    {
-                        winner_dist = euclidean_distances[k][l];
-                        minX = k;
-                        minY = l;
-                    }
-                }
-            }
-
-            current_iteration_cost_function += winner_dist;
+            auto winner = GetBest(trainingInfo.Inputs[j]);
+            current_iteration_cost_function += winner.second;
 
             if (_tough_competition)
             {
-                _som[minX][minY].UpdateWeights(learning_rate, winner_dist);
+                _som[winner.first.X][winner.first.Y].UpdateWeights(trainingInfo.Inputs[j], learning_rate,
+                                                                   winner.second);
+
             } else
             {
-                double min_distance = winner_dist + _delta;
-                for (int k = 0; k < euclidean_distances.size(); ++k)
+                double neighborhood_radius = _radius * std::exp(-i / (trainingInfo.MaxSteps / std::log(_radius)));
+                double neighborhood_diameter = neighborhood_radius * 2;
+                double neighborhood_squared = std::pow(neighborhood_radius, 2);
+
+                int start_x = (int) std::max(0.0, (double) winner.first.X - neighborhood_radius - 1);
+                int start_y = (int) std::max(0.0, (double) winner.first.Y - neighborhood_radius - 1);
+                int end_x = (int) std::min((double) _width, start_x + neighborhood_diameter + 1);
+                int end_y = (int) std::min((double) _height, start_y + neighborhood_diameter + 1);
+
+                for (int x = start_x; x < end_x; ++x)
                 {
-                    for (int l = 0; l < euclidean_distances[k].size(); ++l)
+                    for (int y = start_y; y < end_y; ++y)
                     {
-                        if (euclidean_distances[k][l] < min_distance)
+                        double distance = _som[x][y].GetDistance(_som[winner.first.X][winner.first.Y]);
+                        if (distance <= neighborhood_squared)
                         {
-                            _som[k][l].UpdateWeights(learning_rate, winner_dist);
+                            double influence = std::exp(-distance / (2 * neighborhood_squared));
+                            _som[x][y].UpdateWeights(trainingInfo.Inputs[j], learning_rate, influence);
                         }
                     }
                 }
             }
         }
 
-        current_iteration_cost_function /= madelineTrainingInfo.Inputs.size();
+        learning_rate = trainingInfo.LearningRate * exp(-(double) (i + 1) / trainingInfo.MaxSteps);
 
-        if (_session)
+        /*if (_session)
         {
-            if ((i % (madelineTrainingInfo.MaxSteps / 10)) == 0)
+            if ((i % (trainingInfo.MaxSteps / 10)) == 0)
             {
                 _session->WriteIterationError(current_iteration_cost_function);
             }
-        }
+        }*/
 
-        if (current_iteration_cost_function <= madelineTrainingInfo.ErrorTolerance)
+        current_iteration_cost_function /= trainingInfo.Inputs.size();
+        std::cout << current_iteration_cost_function << std::endl;
+        if (current_iteration_cost_function <= trainingInfo.ErrorTolerance)
         {
             return true;
         }
@@ -121,4 +116,26 @@ void SelfOrgMap::GetOutput(const std::vector<double>& input, std::vector<double>
     {
         (*output)[i] = _som[minX][minY].GetWeights()[i];
     }
+}
+
+BestValue SelfOrgMap::GetBest(const std::vector<double>& input) const
+{
+    Point point;
+    double winner_dist = std::numeric_limits<double>::max();
+
+    for (int i = 0; i < _som.size(); ++i)
+    {
+        for (int j = 0; j < _som[i].size(); ++j)
+        {
+            double euclidean_distance = _som[i][j].GetEuclideanDistance(input);
+            if (euclidean_distance < winner_dist)
+            {
+                winner_dist = euclidean_distance;
+                point.X = i;
+                point.Y = j;
+            }
+        }
+    }
+
+    return {point, winner_dist};
 }
