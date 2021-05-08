@@ -22,4 +22,5 @@ target_include_directories(server
 
 target_link_libraries(server
         PUBLIC
-        common)
+        common
+        Eigen3)
