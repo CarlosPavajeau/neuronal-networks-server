@@ -8,7 +8,7 @@
 
 static std::mt19937 engine;
 
-double drand(double min, double max)
+double d_rand(double min, double max)
 {
     std::uniform_real_distribution<double> uid(min, max);
     return uid(engine);

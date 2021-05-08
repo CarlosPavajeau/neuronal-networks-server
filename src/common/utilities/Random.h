@@ -6,15 +6,22 @@
 #define NEURONAL_NETWORKS_SERVER_RANDOM_H
 
 /* Return a random number in the range min..max */
-double drand(double min, double max);
+double d_rand(double min, double max);
 
 struct gen_rand
 {
 public:
-    double operator()()
+    gen_rand() : _min(-1), _max(1) {}
+
+    gen_rand(double min, double max) : _min(min), _max(max) {}
+
+    double operator()() const
     {
-        return drand(-1, 1);
+        return d_rand(_min, _max);
     }
+
+private:
+    double _min, _max;
 };
 
 #endif //NEURONAL_NETWORKS_SERVER_RANDOM_H
