@@ -10,16 +10,6 @@
 #include <list>
 #include <vector>
 
-class TriggerFunction;
-
-struct LayerCreateInfo
-{
-public:
-    int InputsNumber;
-    int NeuronsNumber;
-    std::string ActivationFunction;
-};
-
 class Layer
 {
 public:
