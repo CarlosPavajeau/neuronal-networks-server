@@ -3,12 +3,13 @@
 //
 
 #include "RadialBasisFunction.h"
+#include "Session.hpp"
 #include "Utils.h"
 
 #include <Eigen/Dense>
 
 RadialBasisFunction::RadialBasisFunction(const std::vector<uint64>& layers_nodes, Session* session) :
-        _output_node((int) layers_nodes[1])
+        _output_node((int) layers_nodes[1]), _session(session)
 {
     Init(layers_nodes);
 }
@@ -94,6 +95,12 @@ bool RadialBasisFunction::Train(const RadialBasisFunctionTrainingInfo& trainingI
         }
 
         current_iteration_cost_function /= (double) trainingInfo.Inputs.size();
+        if (_session)
+        {
+            _session->WriteIterationError(SMSG_TRAIN_RBF, current_iteration_cost_function);
+        }
+
+
         if (current_iteration_cost_function < trainingInfo.ErrorTolerance)
         {
             return true;

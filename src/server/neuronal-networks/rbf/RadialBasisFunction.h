@@ -31,6 +31,8 @@ private:
 
     std::vector<RadialCenter> _radial_centers;
     Node _output_node;
+
+    Session* _session;
 };
 
 
