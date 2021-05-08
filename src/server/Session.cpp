@@ -6,16 +6,19 @@
 #include "Message.hpp"
 #include "MultiLayerPerceptron.hpp"
 #include "SelfOrgMap.h"
+#include "RadialBasisFunction.h"
 #include "Opcodes.hpp"
 #include "OpcodeTable.h"
 #include "MadelineParsers.h"
 #include "SelfOrgMapParsers.h"
+#include "RadialBasisFunctionParsers.h"
 
 #include <boost/json/src.hpp>
 
 namespace json = boost::json;
 
-Session::Session(tcp::socket socket) : _socket(std::move(socket)), _madeline(nullptr), _self_org_map(nullptr)
+Session::Session(tcp::socket socket) : _socket(std::move(socket)), _madeline(nullptr), _self_org_map(nullptr),
+                                       _radial_basis_function(nullptr)
 {
 
 }
@@ -298,4 +301,78 @@ void Session::OnInitSelfOrgMap()
     response_message.EncodeHeader();
 
     Write(response_message);
+}
+
+void Session::HandleInitRbf(Message& message)
+{
+    json::parser parser;
+    parser.write(message.Body(), message.BodyLength());
+    json::value value = parser.release();
+
+    const RadialBasisFunctionCreateInfo createInfo = json::value_to<RadialBasisFunctionCreateInfo>(value);
+
+    _radial_basis_function = new RadialBasisFunction(createInfo.NeuronsPerLayer, this);
+
+    OnInitRbf();
+}
+
+void Session::OnInitRbf()
+{
+
+}
+
+void Session::HandleStartTrainingRbf(Message& message)
+{
+    json::parser parser;
+    parser.write(message.Body(), message.BodyLength());
+    json::value value = parser.release();
+
+    const RadialBasisFunctionTrainingInfo trainingInfo = json::value_to<RadialBasisFunctionTrainingInfo>(value);
+
+    if (_radial_basis_function)
+    {
+        if (-_radial_basis_function->Train(trainingInfo))
+        {
+            std::cout << "[server]: Training success!" << std::endl;
+        } else
+        {
+            std::cout << "[server]: Not training!" << std::endl;
+        }
+    } else
+    {
+        std::cout << "[server]: Radial basis function network not init" << std::endl;
+    }
+}
+
+void Session::HandleSimulateDataRbf(Message& message)
+{
+    json::parser parser;
+    parser.write(message.Body(), message.BodyLength());
+    json::value value = parser.release();
+
+    const std::vector<double> inputs = json::value_to<std::vector<double>>(value);
+    double output;
+
+    if (_radial_basis_function)
+    {
+        _radial_basis_function->GetOutput(inputs, &output);
+
+        Message responseMessage;
+        responseMessage.Opcode(SMSG_SIMULATE_DATA_RBF);
+
+        json::value responseValue = json::value_from(output);
+        std::string response_str = json::serialize(responseValue);
+
+        const char* r_message = response_str.c_str();
+
+        responseMessage.BodyLength(std::strlen(r_message));
+        std::memcpy(responseMessage.Body(), r_message, responseMessage.BodyLength());
+
+        responseMessage.EncodeHeader();
+
+        Write(responseMessage);
+    } else
+    {
+        std::cout << "[server]: Radial basis function network not init!";
+    }
 }

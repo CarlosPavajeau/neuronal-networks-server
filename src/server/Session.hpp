@@ -18,6 +18,8 @@ class MultiLayerPerceptron;
 
 class SelfOrgMap;
 
+class RadialBasisFunction;
+
 class Session : public std::enable_shared_from_this<Session>
 {
 public:
@@ -47,18 +49,28 @@ public:
 
     void HandleSimulateDataSelfOrgMap(Message& message);
 
+    void HandleInitRbf(Message& message);
+
+    void HandleStartTrainingRbf(Message& message);
+
+    void HandleSimulateDataRbf(Message& message);
+
 private:
     void DoReadHeader();
 
     void DoReadBody();
 
     void OnInitMadeline();
+
     void OnInitSelfOrgMap();
+
+    void OnInitRbf();
 
     tcp::socket _socket;
     Message _read_msg, _write_msg;
     MultiLayerPerceptron* _madeline;
     SelfOrgMap* _self_org_map;
+    RadialBasisFunction* _radial_basis_function;
 };
 
 #endif //NEURONAL_NETWORKS_SERVER_SESSION_HPP
