@@ -12,10 +12,10 @@ namespace json = boost::json;
 RadialBasisFunctionCreateInfo
 tag_invoke(const boost::json::value_to_tag<RadialBasisFunctionCreateInfo>&, const boost::json::value& value)
 {
-    uint64 inputs_number = value.at("InputsNumber").as_int64();
-    auto neurons_per_layer = json::value_to<std::vector<uint64>>(value.at("NeuronsPerLayer"));
+    uint64 inputs_number = value.at("InputNumbers").as_int64();
+    uint64 radial_centers = value.at("RadialCenters").as_int64();
 
-    return RadialBasisFunctionCreateInfo(inputs_number, neurons_per_layer);
+    return RadialBasisFunctionCreateInfo(inputs_number, radial_centers);
 }
 
 RadialBasisFunctionTrainingInfo

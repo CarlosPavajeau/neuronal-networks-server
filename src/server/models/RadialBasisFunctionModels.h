@@ -10,14 +10,14 @@
 struct RadialBasisFunctionCreateInfo
 {
 public:
-    RadialBasisFunctionCreateInfo(uint64 inputs_number, const std::vector<uint64>& neurons_per_layer)
+    RadialBasisFunctionCreateInfo(uint64 inputs_number, uint64 radial_centers)
     {
         InputNumbers = inputs_number;
-        NeuronsPerLayer = neurons_per_layer;
+        RadialCenters = radial_centers;
     }
 
     uint64 InputNumbers;
-    std::vector<uint64> NeuronsPerLayer;
+    uint64 RadialCenters;
 };
 
 struct RadialBasisFunctionTrainingInfo
