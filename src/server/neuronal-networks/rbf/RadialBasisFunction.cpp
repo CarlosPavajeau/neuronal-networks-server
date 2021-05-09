@@ -8,17 +8,12 @@
 
 #include <Eigen/Dense>
 
-RadialBasisFunction::RadialBasisFunction(const std::vector<uint64>& layers_nodes, Session* session) :
-        _output_node((int) layers_nodes[1]), _session(session)
+RadialBasisFunction::RadialBasisFunction(uint64 num_inputs, uint64 radial_centers, Session* session) :
+        _output_node(radial_centers), _session(session)
 {
-    Init(layers_nodes);
-}
+    _num_inputs = num_inputs;
 
-void RadialBasisFunction::Init(const std::vector<uint64>& layers_nodes)
-{
-    _num_inputs = layers_nodes[0];
-
-    for (int i = 0; i < layers_nodes[1]; ++i)
+    for (int i = 0; i < radial_centers; ++i)
     {
         _radial_centers.emplace_back(_num_inputs);
     }
@@ -36,8 +31,8 @@ void RadialBasisFunction::GetOutput(const std::vector<double>& input, double* ou
     }
 
     double temp_out;
-
-    _output_node.GetOutputAfterActivationFunction(euclidean_distances, thin_plate_spline, &temp_out);
+    _output_node.GetInputInnerProdWithWeights(euclidean_distances, &temp_out);
+    temp_out += _output_node.GetBias();
 
     *output = temp_out;
 }
@@ -99,7 +94,6 @@ bool RadialBasisFunction::Train(const RadialBasisFunctionTrainingInfo& trainingI
         {
             _session->WriteIterationError(SMSG_TRAIN_RBF, current_iteration_cost_function);
         }
-
 
         if (current_iteration_cost_function < trainingInfo.ErrorTolerance)
         {

@@ -17,14 +17,13 @@ class Session;
 class RadialBasisFunction
 {
 public:
-    RadialBasisFunction(const std::vector<uint64>& layers_nodes, Session* session);
+    RadialBasisFunction(uint64 num_inputs, uint64 radial_centers, Session* session);
 
     void GetOutput(const std::vector<double>& input, double* output) const;
 
     bool Train(const RadialBasisFunctionTrainingInfo& trainingInfo);
 
 private:
-    void Init(const std::vector<uint64>& layers_nodes);
     void SetUpRadialCenters(const std::vector<std::vector<double>>& inputs);
 
     size_t _num_inputs;

@@ -311,7 +311,7 @@ void Session::HandleInitRbf(Message& message)
 
     const RadialBasisFunctionCreateInfo createInfo = json::value_to<RadialBasisFunctionCreateInfo>(value);
 
-    _radial_basis_function = new RadialBasisFunction(createInfo.NeuronsPerLayer, this);
+    _radial_basis_function = new RadialBasisFunction(createInfo.InputNumbers, createInfo.RadialCenters, this);
 
     OnInitRbf();
 }
