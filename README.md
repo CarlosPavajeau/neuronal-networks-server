@@ -8,7 +8,7 @@ is written in C/C++. And it can be used in docker.
 # Requirements
 
 + Platform: Linux, Windows or Mac
-+ Eigen ≥ 3.9
++ Eigen ≥ 3.3.9
 + Boost ≥ 1.70
 + CMake ≥ 3.5
 + GCC ≥ 7.1.0
