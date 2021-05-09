@@ -14,5 +14,8 @@ COPY . .
 
 RUN mkdir build && cd build
 RUN cmake ../
+RUN cd src/NeuronalNetworksServer/
 
 EXPOSE 3000
+
+ENTRYPOINT ["./neuronal_networks_server"]
