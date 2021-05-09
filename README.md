@@ -29,6 +29,8 @@ You can install all the dependencies by running the bash file 'install-dependenc
     + make
 
 + Windows: You can use the graphical interface of Cmake to generate the project for visual studio 2019 and then compile
-  in this IDE 
+  in this IDE
+
++ Docker: To install on docker you just have to run the command " docker build -t name . "
   
 
