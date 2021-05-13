@@ -15,7 +15,7 @@ add_executable(neuronal_networks_server
 target_link_libraries(neuronal_networks_server ${CMAKE_THREAD_LIBS_INIT} common server)
 
 if (UNIX AND NOT NOJEM AND NOT APPLE)
-    set(neuronal_networks_server_LINK_FLAGS "-pthread -lncurses ${neuronal_networks_server_LINK_FLAGS}")
+    set(neuronal_networks_server_LINK_FLAGS "-pthread ${neuronal_networks_server_LINK_FLAGS}")
 endif ()
 
 set_target_properties(neuronal_networks_server PROPERTIES LINK_FLAGS "${neuronal_networks_server_LINK_FLAGS}")
