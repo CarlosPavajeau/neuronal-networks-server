@@ -18,4 +18,4 @@ RUN cd src/NeuronalNetworksServer/
 
 EXPOSE 3000
 
-ENTRYPOINT ["./neuronal_networks_server"]
+ENTRYPOINT ["./neuronal_networks_server 3000"]
