@@ -6,5 +6,7 @@
 #define NEURONAL_NETWORKS_SERVER_ALLMODELS_H
 
 #include "MadelineModels.h"
+#include "SelfOrgMapModels.h"
+#include "RadialBasisFunctionModels.h"
 
 #endif //NEURONAL_NETWORKS_SERVER_ALLMODELS_H
