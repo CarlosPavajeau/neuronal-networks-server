@@ -33,8 +33,8 @@ target_include_directories(neuronal_networks_server
         PRIVATE
         ${CMAKE_CURRENT_BINARY_DIR})
 
-if( UNIX )
+if (UNIX)
     install(TARGETS neuronal_networks_server DESTINATION bin)
-elseif( WIN32 )
+elseif (WIN32)
     install(TARGETS neuronal_networks_server DESTINATION "${CMAKE_INSTALL_PREFIX}")
-endif()
+endif ()

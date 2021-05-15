@@ -152,4 +152,11 @@ inline void vector_to_eigen_vector(const std::vector<double>& x, Eigen::VectorXd
     }
 }
 
+inline bool StringToBool(std::string const& str)
+{
+    std::string lowerStr = str;
+    std::transform(str.begin(), str.end(), lowerStr.begin(), [](char c) { return char(::tolower(c)); });
+    return lowerStr == "1" || lowerStr == "true" || lowerStr == "yes";
+}
+
 #endif //NEURONAL_NETWORKS_SERVER_UTILS_H
