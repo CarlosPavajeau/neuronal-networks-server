@@ -1,4 +1,4 @@
-FROM gcc:latest
+FROM gcc:latest AS build
 
 USER root
 COPY ./doc/install-dependencies.sh /usr/
@@ -13,9 +13,11 @@ WORKDIR .
 COPY . .
 
 RUN mkdir build && cd build
-RUN cmake ../
-RUN cd src/NeuronalNetworksServer/
+RUN cmake ../ && make
+
+FROM build as deploy
+WORKDIR /opt/neuronal-networks-server
+COPY --from=build src/NeuronalNetworksServer/ ./
 
 EXPOSE 3000
-
-ENTRYPOINT ["./neuronal_networks_server 3000"]
+CMD ["./neuronal_networks_server"]
