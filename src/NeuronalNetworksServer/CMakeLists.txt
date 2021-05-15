@@ -33,8 +33,5 @@ target_include_directories(neuronal_networks_server
         PRIVATE
         ${CMAKE_CURRENT_BINARY_DIR})
 
-if (UNIX)
-    install(TARGETS neuronal_networks_server DESTINATION bin)
-elseif (WIN32)
-    install(TARGETS neuronal_networks_server DESTINATION "${CMAKE_INSTALL_PREFIX}")
-endif ()
+ADD_CUSTOM_COMMAND(TARGET neuronal_networks_server POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/neuronalserver.conf" "${CMAKE_CURRENT_BINARY_DIR}")
