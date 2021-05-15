@@ -5,6 +5,7 @@
 #ifndef NEURONAL_NETWORKS_SERVER_RADIALCENTER_H
 #define NEURONAL_NETWORKS_SERVER_RADIALCENTER_H
 
+#include "Define.hpp"
 #include <vector>
 
 class RadialCenter
