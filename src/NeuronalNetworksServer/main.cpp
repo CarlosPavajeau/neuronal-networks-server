@@ -1,23 +1,38 @@
-#include <iostream>
-
 #include "Server.hpp"
+#include "Config.h"
 #include "OpcodeTable.h"
+
+#include <iostream>
+#include <boost/filesystem/operations.hpp>
+#include <boost/log/trivial.hpp>
+
+namespace fs = boost::filesystem;
+
+#ifndef _NEURONAL_NETWORK_CONFIG
+#define _NEURONAL_NETWORK_CONFIG "neuronalserver.conf"
+#endif
 
 int main(int argc, char* argv[])
 {
 
     try
     {
-        if (argc < 2 || argc > 2)
+        auto confFile = fs::absolute(_NEURONAL_NETWORK_CONFIG);
+        std::string configError;
+        if (!sConfigMgr->LoadInitial(confFile.generic_string(), std::vector<std::string>(argv, argv + argc),
+                                     configError))
         {
-            std::cerr << "Usage neuronal_networks_server <port>";
+            printf("Error in config file: %s\n", configError.c_str());
             return 1;
         }
+        BOOST_LOG_TRIVIAL(info) << "Using configuration file " << sConfigMgr->GetFilename().c_str();
 
         boost::asio::io_context io_context;
-        tcp::endpoint endpoint(tcp::v4(), std::atoi(argv[1]));
+        tcp::endpoint endpoint(tcp::v4(), sConfigMgr->GetIntDefault("Port", 3000));
 
+        BOOST_LOG_TRIVIAL(info) << "Initializing the opcode table";
         opcodeTable.Initialize();
+        BOOST_LOG_TRIVIAL(info) << "Initialized opcode table";
 
         Server server(io_context, endpoint);
 

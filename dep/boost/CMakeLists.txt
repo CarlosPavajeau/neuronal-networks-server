@@ -18,7 +18,7 @@ if (CMAKE_VERSION VERSION_LESS "3.16.0")
     set(Boost_NO_BOOST_CMAKE ON)
 endif ()
 
-find_package(Boost 1.76 REQUIRED system iostreams container)
+find_package(Boost 1.76 REQUIRED system iostreams container filesystem log)
 
 add_library(boost INTERFACE)
 
