@@ -12,12 +12,12 @@ namespace json = boost::json;
 
 MadelineCreateInfo tag_invoke(const json::value_to_tag<MadelineCreateInfo>&, const json::value& value)
 {
-    uint64_t inputsNumber = value.at("InputsNumber").as_int64();
+    uint64_t inputNumbers = value.at("InputNumbers").as_int64();
 
     auto neuronsPerLayer = json::value_to<std::vector<uint64_t>>(value.at("NeuronsPerLayer"));
     auto activation_functions_str = json::value_to<std::vector<std::string>>(value.at("ActivationFunctions"));
 
-    return MadelineCreateInfo(inputsNumber, neuronsPerLayer, activation_functions_str);
+    return MadelineCreateInfo(inputNumbers, neuronsPerLayer, activation_functions_str);
 }
 
 MadelineTrainingInfo tag_invoke(const boost::json::value_to_tag<MadelineTrainingInfo>&, const boost::json::value& value)

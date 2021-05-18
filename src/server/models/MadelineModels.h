@@ -11,10 +11,10 @@
 struct MadelineCreateInfo
 {
 public:
-    MadelineCreateInfo(uint64 inputs_number, const std::vector<uint64>& neurons_per_layer,
+    MadelineCreateInfo(uint64 input_numbers, const std::vector<uint64>& neurons_per_layer,
                        const std::vector<std::string>& activation_functions)
     {
-        InputNumbers = inputs_number;
+        InputNumbers = input_numbers;
         NeuronsPerLayer = neurons_per_layer;
         ActivationFunctions = activation_functions;
     }
