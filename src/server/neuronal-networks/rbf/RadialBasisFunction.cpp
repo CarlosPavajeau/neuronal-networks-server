@@ -32,7 +32,6 @@ void RadialBasisFunction::GetOutput(const std::vector<double>& input, double* ou
 
     double temp_out;
     _output_node.GetInputInnerProdWithWeights(euclidean_distances, &temp_out);
-    temp_out += _output_node.GetBias();
 
     *output = temp_out;
 }

@@ -34,6 +34,7 @@ void Node::WeightInitialization(int nun_inputs)
     _weights.resize(_num_inputs);
 
     std::generate_n(_weights.begin(), _num_inputs, gen_rand());
+    _bias = d_rand(-1, 1);
 }
 
 void Node::GetInputInnerProdWithWeights(const std::vector<double>& input, double* output) const
@@ -42,7 +43,7 @@ void Node::GetInputInnerProdWithWeights(const std::vector<double>& input, double
 
     double inner_prod = std::inner_product(input.begin(), input.end(), _weights.begin(), 0.0);
 
-    *output = inner_prod;
+    *output = inner_prod + _bias;
 }
 
 void Node::GetOutputAfterActivationFunction(const std::vector<double>& input,
@@ -60,6 +61,8 @@ void Node::UpdateWeights(const std::vector<double>& x, double error, double lear
     {
         _weights[i] += x[i] * learning_rate * error;
     }
+
+    _bias += learning_rate * error;
 }
 
 void Node::UpdateWeight(int weight_id, double increment, double learning_rate)
