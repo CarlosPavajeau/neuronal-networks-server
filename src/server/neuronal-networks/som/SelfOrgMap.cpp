@@ -72,10 +72,7 @@ bool SelfOrgMap::Train(const SelfOrgMapTrainingInfo& trainingInfo)
 
         if (_session)
         {
-            if ((i % (trainingInfo.MaxSteps / 10)) == 0)
-            {
-                _session->WriteIterationError(SMSG_TRAIN_SELF_ORG_MAP, current_iteration_cost_function);
-            }
+            _session->WriteIterationError(SMSG_TRAIN_SELF_ORG_MAP, current_iteration_cost_function);
         }
 
         current_iteration_cost_function /= (double) trainingInfo.Inputs.size();
