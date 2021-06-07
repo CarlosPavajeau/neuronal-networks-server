@@ -17,7 +17,7 @@ tag_invoke(const boost::json::value_to_tag<SelfOrgMapCreateInfo>&, const boost::
 {
     uint64 width = value.at("Width").as_int64();
     uint64 height = value.at("Height").as_int64();
-    int num_inputs = (int) value.at("InputsNumber").as_int64();
+    int num_inputs = (int) value.at("InputNumbers").as_int64();
 
     double delta;
     if (value.at("Delta").is_double())

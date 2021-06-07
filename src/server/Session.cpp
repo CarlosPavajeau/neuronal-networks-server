@@ -358,7 +358,7 @@ void Session::HandleStartTrainingRbf(Message& message)
     const char* r_message;
     if (_radial_basis_function)
     {
-        if (-_radial_basis_function->Train(trainingInfo))
+        if (_radial_basis_function->Train(trainingInfo))
         {
             std::cout << "[server]: Training success!" << std::endl;
             r_message = "true";
