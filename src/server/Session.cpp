@@ -158,23 +158,10 @@ void Session::HandleStartTrainingMadeline(Message& message)
 
     if (_madeline)
     {
-        Message trainMessage;
-        trainMessage.Opcode(SMSG_TRAIN_MADELINE);
-        const char* r_message;
         if (_madeline->Train(madelineTrainingInfo))
         {
             std::cout << "[server]: Training success!" << std::endl;
-            r_message = "true";
-        } else
-        {
-            r_message = "false";
         }
-
-        trainMessage.BodyLength(std::strlen(r_message));
-        std::memcpy(trainMessage.Body(), r_message, trainMessage.BodyLength());
-        trainMessage.EncodeHeader();
-
-        Write(trainMessage);
     } else
     {
         std::cout << "[server]: MultiLayerPerceptron not init" << std::endl;
@@ -254,24 +241,13 @@ void Session::HandleStartTrainingSelfOrgMap(Message& message)
 
         const SelfOrgMapTrainingInfo trainingInfo = json::value_to<SelfOrgMapTrainingInfo>(value);
 
-        Message trainMessage;
-        trainMessage.Opcode(SMSG_TRAIN_SELF_ORG_MAP);
-        const char* r_message;
         if (_self_org_map->Train(trainingInfo))
         {
             std::cout << "[server]: Training success!" << std::endl;
-            r_message = "true";
         } else
         {
             std::cout << "[server]: Not training!" << std::endl;
-            r_message = "false";
         }
-
-        trainMessage.BodyLength(std::strlen(r_message));
-        std::memcpy(trainMessage.Body(), r_message, trainMessage.BodyLength());
-        trainMessage.EncodeHeader();
-
-        Write(trainMessage);
     } else
     {
         std::cout << "[server]: SelfOrgMap not init!" << std::endl;
@@ -353,26 +329,15 @@ void Session::HandleStartTrainingRbf(Message& message)
 
     const RadialBasisFunctionTrainingInfo trainingInfo = json::value_to<RadialBasisFunctionTrainingInfo>(value);
 
-    Message trainMessage;
-    trainMessage.Opcode(SMSG_TRAIN_SELF_ORG_MAP);
-    const char* r_message;
     if (_radial_basis_function)
     {
         if (_radial_basis_function->Train(trainingInfo))
         {
             std::cout << "[server]: Training success!" << std::endl;
-            r_message = "true";
         } else
         {
             std::cout << "[server]: Not training!" << std::endl;
-            r_message = "false";
         }
-
-        trainMessage.BodyLength(std::strlen(r_message));
-        std::memcpy(trainMessage.Body(), r_message, trainMessage.BodyLength());
-        trainMessage.EncodeHeader();
-
-        Write(trainMessage);
     } else
     {
         std::cout << "[server]: Radial basis function network not init" << std::endl;
