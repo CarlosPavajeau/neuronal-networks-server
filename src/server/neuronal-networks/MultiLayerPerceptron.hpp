@@ -10,6 +10,7 @@
 #include "Define.hpp"
 
 #include <vector>
+#include <memory>
 
 class Session;
 
@@ -19,7 +20,7 @@ class MultiLayerPerceptron
 
 public:
     explicit MultiLayerPerceptron(const std::vector<uint64>& layers_nodes,
-                                  const std::vector<std::string>& layers_act_funcs, Session* session);
+                                  const std::vector<std::string>& layers_act_funcs, std::shared_ptr<Session> session);
 
     ~MultiLayerPerceptron();
 
@@ -50,7 +51,7 @@ private:
 
     std::vector<uint64> _layer_nodes;
     std::vector<Layer> _layers;
-    Session* _session;
+    std::shared_ptr<Session> _session;
 };
 
 #endif //NEURONAL_NETWORKS_SERVER_MULTILAYER_PERCEPTRON_Hs

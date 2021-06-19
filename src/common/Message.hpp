@@ -20,7 +20,7 @@ public:
     };
     enum
     {
-        max_body_length = 4096
+        max_body_length = 8192
     };
 
     Message() : _body_length(0) {}

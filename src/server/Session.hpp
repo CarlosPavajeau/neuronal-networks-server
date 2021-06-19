@@ -10,6 +10,7 @@
 
 #include <memory>
 #include <iostream>
+#include <deque>
 #include <boost/asio.hpp>
 
 using boost::asio::ip::tcp;
@@ -19,6 +20,8 @@ class MultiLayerPerceptron;
 class SelfOrgMap;
 
 class RadialBasisFunction;
+
+typedef std::deque<Message> MessageQueue;
 
 class Session : public std::enable_shared_from_this<Session>
 {
@@ -60,14 +63,17 @@ private:
 
     void DoReadBody();
 
+    void DoWrite();
+
     void OnInitMadeline();
 
     void OnInitSelfOrgMap();
 
     void OnInitRbf();
-
+    
     tcp::socket _socket;
     Message _read_msg, _write_msg;
+    MessageQueue _write_msgs;
     MultiLayerPerceptron* _madeline;
     SelfOrgMap* _self_org_map;
     RadialBasisFunction* _radial_basis_function;

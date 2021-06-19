@@ -10,7 +10,7 @@
 
 MultiLayerPerceptron::MultiLayerPerceptron(const std::vector<uint64>& layers_nodes,
                                            const std::vector<std::string>& layers_act_funcs,
-                                           Session* session) : _session(session)
+                                           std::shared_ptr<Session> session) : _session(session)
 {
     assert(layers_nodes.size() >= 2);
     assert(layers_act_funcs.size() + 1 == layers_nodes.size());

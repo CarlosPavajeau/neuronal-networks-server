@@ -40,23 +40,12 @@ void Session::Start()
 
 void Session::Write(const Message& msg)
 {
-    _write_msg = msg;
-    auto self(shared_from_this());
-
-    boost::asio::async_write(_socket,
-                             boost::asio::buffer(_write_msg.Data(), _write_msg.Length()),
-                             [this, self](boost::system::error_code ec, std::size_t /*length*/)
-                             {
-                                 if (!ec)
-                                 {
-                                     auto opcode = static_cast<OpcodeClient>(_write_msg.Opcode());
-                                     std::cout << "[server]: Send opcode: " << GetOpcodeNameForLogging(opcode)
-                                               << std::endl;
-                                 } else
-                                 {
-                                     std::cout << "Error: " << ec.message() << std::endl;
-                                 }
-                             });
+    bool write_in_progress = !_write_msgs.empty();
+    _write_msgs.push_back(msg);
+    if (!write_in_progress)
+    {
+        DoWrite();
+    }
 }
 
 void Session::WriteIterationError(Opcodes opcode, double iteration_error)
@@ -128,6 +117,32 @@ void Session::DoReadBody()
                             });
 }
 
+
+void Session::DoWrite()
+{
+    auto self(shared_from_this());
+    boost::asio::async_write(_socket, boost::asio::buffer(_write_msgs.front().Data(), _write_msgs.front().Length()),
+                             [this, self](boost::system::error_code ec, std::size_t /*length*/)
+                             {
+                                 if (!ec)
+                                 {
+                                     auto opcode = static_cast<OpcodeClient>(_write_msgs.front().Opcode());
+                                     std::cout << "[server]: Send opcode: " << GetOpcodeNameForLogging(opcode)
+                                               << std::endl;
+
+                                     _write_msgs.pop_front();
+                                     if (!_write_msgs.empty())
+                                     {
+                                         DoWrite();
+                                     }
+                                 } else
+                                 {
+                                     std::cout << "Error: " << ec.message() << std::endl;
+                                 }
+                             });
+}
+
+
 void Session::HandleServerSide(Message& message)
 {
     std::cout << "[server]: Received server-side opcode "
@@ -141,9 +156,8 @@ void Session::HandleInitMadeline(Message& message)
     json::value value = parser.release();
 
     const MadelineCreateInfo madelineCreateInfo = json::value_to<MadelineCreateInfo>(value);
-
     _madeline = new MultiLayerPerceptron(madelineCreateInfo.NeuronsPerLayer, madelineCreateInfo.ActivationFunctions,
-                                         this);
+                                         shared_from_this());
 
     OnInitMadeline();
 }
@@ -211,6 +225,7 @@ void Session::OnInitMadeline()
 
     const char* r_message = message_str.c_str();
     response_message.BodyLength(std::strlen(r_message));
+    std::cout << "Message length: " << std::strlen(r_message);
     std::memcpy(response_message.Body(), r_message, response_message.BodyLength());
     response_message.EncodeHeader();
 
